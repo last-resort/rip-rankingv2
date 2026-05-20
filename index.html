@@ -5,124 +5,108 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rock im Park Ranker — 2008–2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:#0a0a0a; --surface:#111; --surface2:#1a1a1a; --border:#2a2a2a;
-    --accent:#e8ff00; --accent2:#ff4400; --text:#f0f0f0; --muted:#555;
-    --ranked-bg:#141f00; --ranked-border:#3a5500;
-    --tie-bg:#1a1800; --tie-border:#443800;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh;overflow-x:hidden;}
+:root{--bg:#0a0a0a;--surface:#111;--surface2:#1a1a1a;--border:#2a2a2a;--accent:#e8ff00;--accent2:#ff4400;--text:#f0f0f0;--muted:#555;--ranked-bg:#141f00;--ranked-border:#3a5500;--tie-bg:#1a1800;--tie-border:#443800;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh;overflow-x:hidden;}
 
-  /* ── HEADER ── */
-  header{border-bottom:2px solid var(--accent);padding:14px 24px;display:flex;align-items:center;gap:16px;background:var(--surface);position:sticky;top:0;z-index:100;}
-  header h1{font-family:'Black Han Sans',sans-serif;font-size:clamp(1.1rem,2.2vw,1.8rem);letter-spacing:.04em;color:var(--accent);white-space:nowrap;}
-  header h1 span{color:var(--accent2);}
-  .header-info{font-size:.6rem;color:var(--muted);line-height:1.7;}
-  .header-actions{margin-left:auto;display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
-  .btn{font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700;letter-spacing:.08em;padding:6px 12px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text);transition:all .15s;text-transform:uppercase;}
-  .btn:hover{border-color:var(--accent);color:var(--accent);}
-  .btn-accent{background:var(--accent);color:#000;border-color:var(--accent);}
-  .btn-accent:hover{background:#ffff55;color:#000;}
-  .btn-danger:hover{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+header{border-bottom:2px solid var(--accent);padding:14px 24px;display:flex;align-items:center;gap:16px;background:var(--surface);position:sticky;top:0;z-index:100;}
+header h1{font-family:'Black Han Sans',sans-serif;font-size:clamp(1.1rem,2.2vw,1.8rem);letter-spacing:.04em;color:var(--accent);white-space:nowrap;}
+header h1 span{color:var(--accent2);}
+.header-info{font-size:.6rem;color:var(--muted);line-height:1.7;}
+.header-actions{margin-left:auto;display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
 
-  /* ── LAYOUT ── */
-  .layout{display:grid;grid-template-columns:280px 1fr 330px;height:calc(100vh - 61px);}
-  .panel{display:flex;flex-direction:column;overflow:hidden;}
-  .panel-left{border-right:2px solid var(--border);background:var(--surface);}
-  .panel-center{background:var(--bg);}
-  .panel-right{border-left:2px solid var(--border);background:var(--surface);}
+.btn{font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700;letter-spacing:.08em;padding:6px 12px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text);transition:all .15s;text-transform:uppercase;}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+.btn-accent{background:var(--accent);color:#000;border-color:var(--accent);}
+.btn-accent:hover{background:#ffff55;color:#000;}
+.btn-danger:hover{background:var(--accent2);color:#fff;border-color:var(--accent2);}
 
-  .panel-title{font-family:'Black Han Sans',sans-serif;font-size:.72rem;letter-spacing:.15em;color:var(--muted);padding:11px 13px 9px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;text-transform:uppercase;flex-shrink:0;}
-  .panel-title .count{margin-left:auto;background:var(--accent);color:#000;font-family:'Space Mono',monospace;font-size:.58rem;padding:2px 6px;font-weight:700;}
+.layout{display:grid;grid-template-columns:280px 1fr 330px;height:calc(100vh - 61px);}
+.panel{display:flex;flex-direction:column;overflow:hidden;}
+.panel-left{border-right:2px solid var(--border);background:var(--surface);}
+.panel-center{background:var(--bg);}
+.panel-right{border-left:2px solid var(--border);background:var(--surface);}
 
-  /* ── LEFT ── */
-  .filter-area{flex-shrink:0;border-bottom:1px solid var(--border);}
-  .search-wrap{padding:7px 9px;border-bottom:1px solid var(--border);}
-  .search-wrap input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Space Mono',monospace;font-size:.72rem;padding:5px 9px;outline:none;}
-  .search-wrap input:focus{border-color:var(--accent);}
-  .search-wrap input::placeholder{color:var(--muted);}
-  .year-filters{padding:6px 8px;display:flex;flex-wrap:wrap;gap:4px;}
-  .year-btn{font-family:'Space Mono',monospace;font-size:.56rem;padding:3px 6px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .12s;}
-  .year-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(232,255,0,.07);}
-  .year-btn:hover{color:var(--text);border-color:#444;}
-  .band-list{flex:1;overflow-y:auto;padding:3px 0;}
-  .band-list::-webkit-scrollbar{width:3px;}
-  .band-list::-webkit-scrollbar-thumb{background:var(--border);}
+.panel-title{font-family:'Black Han Sans',sans-serif;font-size:.72rem;letter-spacing:.15em;color:var(--muted);padding:11px 13px 9px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;text-transform:uppercase;flex-shrink:0;}
+.panel-title .count{margin-left:auto;background:var(--accent);color:#000;font-family:'Space Mono',monospace;font-size:.58rem;padding:2px 6px;font-weight:700;}
 
-  .band-item{padding:5px 13px;font-size:.73rem;cursor:grab;display:flex;align-items:center;gap:7px;border-left:3px solid transparent;transition:all .1s;user-select:none;}
-  .band-item:hover{background:var(--surface2);border-left-color:var(--accent);}
-  .band-item.dragging{opacity:.35;}
-  .drag-handle{color:var(--muted);font-size:.68rem;flex-shrink:0;}
-  .item-name{flex:1;}
-  .item-year{font-size:.6rem;color:var(--accent);opacity:.7;font-weight:700;flex-shrink:0;}
+.filter-area{flex-shrink:0;border-bottom:1px solid var(--border);}
+.search-wrap{padding:7px 9px;border-bottom:1px solid var(--border);}
+.search-wrap input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Space Mono',monospace;font-size:.72rem;padding:5px 9px;outline:none;}
+.search-wrap input:focus{border-color:var(--accent);}
+.search-wrap input::placeholder{color:var(--muted);}
+.year-filters{padding:6px 8px;display:flex;flex-wrap:wrap;gap:4px;}
+.year-btn{font-family:'Space Mono',monospace;font-size:.56rem;padding:3px 6px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .12s;}
+.year-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(232,255,0,.07);}
+.year-btn:hover{color:var(--text);border-color:#444;}
+.band-list{flex:1;overflow-y:auto;padding:3px 0;}
+.band-list::-webkit-scrollbar{width:3px;}
+.band-list::-webkit-scrollbar-thumb{background:var(--border);}
 
-  /* ── CENTER ── */
-  .drop-zone{flex:1;overflow-y:auto;padding:5px;}
-  .drop-zone::-webkit-scrollbar{width:3px;}
-  .drop-zone::-webkit-scrollbar-thumb{background:var(--border);}
-  .drop-zone.drag-over{background:rgba(232,255,0,.025);}
-  .drop-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--muted);font-size:.73rem;pointer-events:none;text-align:center;padding:20px;}
-  .drop-empty .big{font-size:2.2rem;}
+.band-item{padding:5px 13px;font-size:.73rem;cursor:grab;display:flex;align-items:center;gap:7px;border-left:3px solid transparent;transition:all .1s;user-select:none;}
+.band-item:hover{background:var(--surface2);border-left-color:var(--accent);}
+.band-item.dragging{opacity:.35;}
+.drag-handle{color:var(--muted);font-size:.68rem;flex-shrink:0;}
+.item-name{flex:1;}
+.item-year{font-size:.6rem;color:var(--accent);opacity:.7;font-weight:700;flex-shrink:0;}
 
-  /* rank group = one rank position (may contain 1+ tied items) */
-  .rank-group{margin-bottom:2px;}
+.drop-zone{flex:1;overflow-y:auto;padding:5px;}
+.drop-zone::-webkit-scrollbar{width:3px;}
+.drop-zone::-webkit-scrollbar-thumb{background:var(--border);}
+.drop-zone.drag-over{background:rgba(232,255,0,.025);}
+.drop-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--muted);font-size:.73rem;pointer-events:none;text-align:center;padding:20px;}
+.drop-empty .big{font-size:2.2rem;}
 
-  .ranked-item{display:flex;align-items:center;gap:7px;padding:6px 9px;background:var(--ranked-bg);border:1px solid var(--ranked-border);border-left:3px solid var(--accent);cursor:grab;transition:background .1s;user-select:none;}
-  .ranked-item:hover{background:#1c2e00;}
-  .ranked-item.dragging{opacity:.3;}
-  .ranked-item.drop-above{border-top:2px solid var(--accent2);}
+.rank-group{margin-bottom:2px;}
+.ranked-item{display:flex;align-items:center;gap:7px;padding:6px 9px;background:var(--ranked-bg);border:1px solid var(--ranked-border);border-left:3px solid var(--accent);cursor:grab;transition:background .1s;user-select:none;}
+.ranked-item:hover{background:#1c2e00;}
+.ranked-item.dragging{opacity:.3;}
+.ranked-item.drop-above{border-top:2px solid var(--accent2);}
+.ranked-item.is-tie{background:var(--tie-bg);border-color:var(--tie-border);border-left:3px solid var(--accent);margin-top:1px;padding-left:22px;}
+.ranked-item.is-tie .rank-num{color:var(--muted);font-size:.75rem;}
 
-  /* tied items after the first get indent + different border */
-  .ranked-item.is-tie{background:var(--tie-bg);border-color:var(--tie-border);border-left:3px solid var(--accent);margin-top:1px;padding-left:22px;}
-  .ranked-item.is-tie .rank-num{color:var(--muted);font-size:.75rem;}
+.rank-num{font-family:'Black Han Sans',sans-serif;font-size:.95rem;color:var(--accent);min-width:30px;text-align:right;flex-shrink:0;}
+.rank-num.top3{color:#ffd700;font-size:1.15rem;}
+.rank-num.top10{color:#aaa;}
+.ranked-name{flex:1;font-size:.78rem;font-weight:700;}
+.ranked-year-badge{font-size:.6rem;font-weight:700;color:#000;background:var(--accent);padding:1px 5px;flex-shrink:0;}
+.tie-btn{background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:.6rem;padding:1px 5px;line-height:1.4;transition:all .12s;flex-shrink:0;font-family:'Space Mono',monospace;}
+.tie-btn:hover{border-color:var(--accent);color:var(--accent);}
+.tie-btn.active{border-color:var(--accent2);color:var(--accent2);}
+.remove-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.82rem;padding:0 2px;line-height:1;transition:color .1s;flex-shrink:0;}
+.remove-btn:hover{color:var(--accent2);}
 
-  .rank-num{font-family:'Black Han Sans',sans-serif;font-size:.95rem;color:var(--accent);min-width:30px;text-align:right;flex-shrink:0;}
-  .rank-num.top3{color:#ffd700;font-size:1.15rem;}
-  .rank-num.top10{color:#aaa;}
-  .ranked-name{flex:1;font-size:.78rem;font-weight:700;}
-  .ranked-year-badge{font-size:.6rem;font-weight:700;color:#000;background:var(--accent);padding:1px 5px;flex-shrink:0;}
+/* loading state */
+.loading-msg{padding:20px;text-align:center;color:var(--muted);font-size:.72rem;line-height:2;}
 
-  /* tie/untie button */
-  .tie-btn{background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:.6rem;padding:1px 5px;line-height:1.4;transition:all .12s;flex-shrink:0;font-family:'Space Mono',monospace;}
-  .tie-btn:hover{border-color:var(--accent);color:var(--accent);}
-  .tie-btn.active{border-color:var(--accent2);color:var(--accent2);}
+.factor-ctrl{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.factor-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.factor-label{font-size:.62rem;color:var(--muted);flex:1;line-height:1.5;}
+.factor-val{font-family:'Black Han Sans',sans-serif;font-size:1rem;color:var(--accent);min-width:36px;text-align:right;}
+input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;height:3px;}
+.factor-hint{font-size:.56rem;color:var(--muted);line-height:1.6;}
 
-  .remove-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.82rem;padding:0 2px;line-height:1;transition:color .1s;flex-shrink:0;}
-  .remove-btn:hover{color:var(--accent2);}
+.stats-content{flex:1;overflow-y:auto;padding:8px 10px;}
+.stats-content::-webkit-scrollbar{width:3px;}
+.stats-content::-webkit-scrollbar-thumb{background:var(--border);}
+.year-stat{margin-bottom:6px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--muted);}
+.year-stat.has-data{border-left-color:var(--accent);}
+.year-stat-header{display:flex;align-items:baseline;gap:5px;margin-bottom:2px;}
+.year-label{font-family:'Black Han Sans',sans-serif;font-size:.95rem;color:var(--accent);}
+.year-stat:not(.has-data) .year-label{color:var(--muted);}
+.avg-score{font-size:.72rem;margin-left:auto;color:var(--muted);}
+.year-stat.has-data .avg-score{color:var(--accent);font-weight:700;}
+.adj-score{font-size:.65rem;color:var(--accent2);margin-left:3px;}
+.ranked-count{font-size:.58rem;color:var(--muted);}
+.bar-wrap{height:3px;background:var(--border);margin-top:4px;}
+.bar-fill{height:100%;background:var(--accent);transition:width .4s cubic-bezier(.25,.46,.45,.94);}
+.no-stats{padding:20px;text-align:center;color:var(--muted);font-size:.7rem;line-height:2;}
 
-  /* ── RIGHT ── */
-  .stats-content{flex:1;overflow-y:auto;padding:8px 10px;}
-  .stats-content::-webkit-scrollbar{width:3px;}
-  .stats-content::-webkit-scrollbar-thumb{background:var(--border);}
-
-  /* factor control */
-  .factor-ctrl{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
-  .factor-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
-  .factor-label{font-size:.62rem;color:var(--muted);flex:1;line-height:1.5;}
-  .factor-val{font-family:'Black Han Sans',sans-serif;font-size:1rem;color:var(--accent);min-width:36px;text-align:right;}
-  input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;height:3px;}
-  .factor-hint{font-size:.56rem;color:var(--muted);line-height:1.6;}
-
-  .year-stat{margin-bottom:6px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--muted);}
-  .year-stat.has-data{border-left-color:var(--accent);}
-  .year-stat-header{display:flex;align-items:baseline;gap:5px;margin-bottom:2px;}
-  .year-label{font-family:'Black Han Sans',sans-serif;font-size:.95rem;color:var(--accent);}
-  .year-stat:not(.has-data) .year-label{color:var(--muted);}
-  .avg-score{font-size:.72rem;margin-left:auto;color:var(--muted);}
-  .year-stat.has-data .avg-score{color:var(--accent);font-weight:700;}
-  .adj-score{font-size:.65rem;color:var(--accent2);margin-left:3px;}
-  .ranked-count{font-size:.58rem;color:var(--muted);}
-  .bar-wrap{height:3px;background:var(--border);margin-top:4px;}
-  .bar-fill{height:100%;background:var(--accent);transition:width .4s cubic-bezier(.25,.46,.45,.94);}
-  .no-stats{padding:20px;text-align:center;color:var(--muted);font-size:.7rem;line-height:2;}
-
-  /* ── TOAST + GHOST ── */
-  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--accent);color:#000;font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;padding:8px 16px;z-index:9999;transition:transform .22s;pointer-events:none;}
-  .toast.show{transform:translateX(-50%) translateY(0);}
-  .drag-ghost{position:fixed;pointer-events:none;background:var(--accent);color:#000;font-family:'Space Mono',monospace;font-size:.72rem;font-weight:700;padding:4px 11px;z-index:9999;transform:translate(-50%,-50%) rotate(-2deg);display:none;white-space:nowrap;}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--accent);color:#000;font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;padding:8px 16px;z-index:9999;transition:transform .22s;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.drag-ghost{position:fixed;pointer-events:none;background:var(--accent);color:#000;font-family:'Space Mono',monospace;font-size:.72rem;font-weight:700;padding:4px 11px;z-index:9999;transform:translate(-50%,-50%) rotate(-2deg);display:none;white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -130,8 +114,8 @@
 <header>
   <h1>ROCK IM PARK <span>RANKER</span></h1>
   <div class="header-info">
-    2008–2026 · Auftritte einzeln rankbar · Gleichstand möglich<br>
-    Drag &amp; Drop oder Doppelklick · = verknüpft mit darüber
+    2008–2026 · Daten aus bands.csv · Auftritte einzeln rankbar<br>
+    Drag &amp; Drop oder Doppelklick · = verbindet mit darüber
   </div>
   <div class="header-actions">
     <button class="btn btn-danger" onclick="clearAll()">RESET</button>
@@ -142,26 +126,20 @@
 </header>
 
 <div class="layout">
-
-  <!-- LEFT: unranked -->
   <div class="panel panel-left">
-    <div class="panel-title">AUFTRITTE <span class="count" id="unranked-count">0</span></div>
+    <div class="panel-title">AUFTRITTE <span class="count" id="unranked-count">…</span></div>
     <div class="filter-area">
       <div class="search-wrap">
         <input type="text" id="search" placeholder="Band oder Jahr suchen…" oninput="renderBandList()">
       </div>
       <div class="year-filters" id="year-filters"></div>
     </div>
-    <div class="band-list" id="band-list"></div>
+    <div class="band-list" id="band-list"><div class="loading-msg">Lade bands.csv…</div></div>
   </div>
-
-  <!-- CENTER: ranked -->
   <div class="panel panel-center">
     <div class="panel-title">RANGLISTE <span class="count" id="ranked-count">0</span></div>
     <div class="drop-zone" id="drop-zone"
-         ondragover="onZoneDragOver(event)"
-         ondrop="onZoneDrop(event)"
-         ondragleave="onZoneDragLeave(event)">
+         ondragover="onZoneDragOver(event)" ondrop="onZoneDrop(event)" ondragleave="onZoneDragLeave(event)">
       <div class="drop-empty" id="drop-empty">
         <span class="big">🎸</span>
         Auftritte von links hierher ziehen<br>
@@ -169,527 +147,500 @@
       </div>
     </div>
   </div>
-
-  <!-- RIGHT: stats -->
   <div class="panel panel-right">
     <div class="panel-title">JAHRES-STATISTIK</div>
-
-    <!-- factor control -->
     <div class="factor-ctrl">
       <div class="factor-row">
         <span class="factor-label">Anzahl-Faktor<br><span style="font-size:.55rem">(±Abw. vom Ø × Faktor auf Rang)</span></span>
-        <span class="factor-val" id="factor-display">0.0</span>
+        <span class="factor-val" id="factor-display">0.00</span>
       </div>
       <input type="range" id="factor-slider" min="0" max="2" step="0.05" value="0" oninput="onFactorChange()">
       <div class="factor-hint" id="factor-hint">Faktor 0 = kein Einfluss der Bandanzahl</div>
     </div>
-
     <div class="stats-content" id="stats-content">
       <div class="no-stats">Noch nichts gerankt.</div>
     </div>
   </div>
-
 </div>
 
 <div class="drag-ghost" id="drag-ghost"></div>
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════════════════
-// DATA
-// ══════════════════════════════════════════════════════════
-const YEARS = [2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2022,2023,2024,2025,2026];
+// ═══════════════════════════════════════════════════
+// CSV LOADER
+// ═══════════════════════════════════════════════════
+let ALL_SLOTS = [];
+let ALL_IDS   = [];
+let slotById  = {};
+let YEARS     = [];
+let dataReady = false;
 
-const RAW_DATA = {
-  2008:["3 Doors Down","36 Crazyfists","Against Me!","Airbourne","Alter Bridge","Animal Alpha","Babyshambles","Bad Religion","Bedouin Soundclash","Black Dahlia Murder","Black Stone Cherry","Black Tide","Bloodlights","Booka Shade","Bullet For My Valentine","CSS","Cavalera Conspiracy","Chiodos","Coheed And Cambria","Culcha Candela","Danko Jones","Die Toten Hosen","Dimmu Borgir","Disco Ensemble","Disturbed","Eagles Of Death Metal","Fair To Midland","Fettes Brot","Fiction Plane","Filter","Finger Eleven","From First To Last","Gavin DeGraw","Gavin Rossdale","High On Fire","HIM","Hot Chip","In Case Of Fire","In Flames","Incubus","Jimmy Eat World","Johnossi","Jonathan Davis","Justice","Kate Nash","Kid Rock","Kill Hannah","Lostprophets","Madsen","Manic Street Preachers","Masters Of Reality","Metallica","Motörhead","Nightwish","Oomph!","Opeth","Paramore","Queens Of The Stone Age","Rage Against The Machine","Rival Schools","Rose Tattoo","Saul Williams","Saxon","Seether","Serj Tankian","Silverstein","Simple Plan","Söhne Mannheims","Sonic Syndicate","Sportfreunde Stiller","Stereophonics","Takida","The Fall Of Troy","The Fratellis","The Futureheads","The Hellacopters","The Offspring","The Prodigy","The Streets","The Verve","Tokyo Police Club","Turisas"],
-  2009:["2raumwohnung","A Day To Remember","Alexisonfire","All That Remains","...And You Will Know Us By The Trail Of Dead","Basement Jaxx","Biffy Clyro","Billy Talent","Black Stone Cherry","Bloc Party","Bring Me The Horizon","Chris Cornell","Dir En Grey","DragonForce","Dredg","Enter Shikari","Five Finger Death Punch","Flogging Molly","Gallows","Guano Apes","Hollywood Undead","Jan Delay","Juliette Lewis","Kettcar","Killians","Killswitch Engage","Korn","Limp Bizkit","Machine Head","Madina Lake","Madness","Mando Diao","Marilyn Manson","Middle Class Rut","New Found Glory","Pain","Papa Roach","Peter Fox","Placebo","Polarkreis 18","Razorlight","Reamonn","Scouting For Girls","Selig","Sevendust","Shinedown","Slipknot","Staind","The All-American Rejects","The Gaslight Anthem","The Killers","The Kooks","The Prodigy","The Script","The Subways","Tomte","Trivium","Volbeat","White Lies"],
-  2010:["30 Seconds To Mars","A Day To Remember","Airbourne","Bad Religion","Biffy Clyro","Broilers","Bullet For My Valentine","Editors","Guano Apes","Halestorm","HIM","Hollywood Undead","Interpol","Jimmy Eat World","Kaiser Chiefs","Kiss","Limp Bizkit","Mando Diao","Muse","Papa Roach","Pendulum","Placebo","Rage Against The Machine","Rammstein","Rise Against","Serj Tankian","Shinedown","Sick Puppies","Social Distortion","The Gaslight Anthem","The Kooks","The Offspring","Trivium","Volbeat","Weezer"],
-  2011:["...And You Will Know Us By The Trail Of Dead","3 Doors Down","All That Remains","Alter Bridge","Architects","As I Lay Dying","Asking Alexandria","August Burns Red","Avenged Sevenfold","Beatsteaks","Biffy Clyro","Black Stone Cherry","Blink-182","Bring Me The Horizon","Coldplay","Devil Wears Prada","Disturbed","Gaslight Anthem","Hollywood Undead","Hurts","In Flames","Interpol","Kings Of Leon","Korn","Kraftklub","Lifehouse","Mando Diao","Millencolin","New Found Glory","Plain White T's","Refused","Rob Zombie","Royal Republic","Sevendust","Social Distortion","Söhne Mannheims","System Of A Down","The Bosshoss","The Kooks","Trivium","Volbeat"],
-  2012:["As I Lay Dying","Anthrax","Awolnation","Billy Talent","Crystal Castles","Deichkind","DevilDriver","Dick Brave And The Backbeats","Die Toten Hosen","Donots","Dropkick Murphys","Enter Shikari","Evanescence","Gojira","Gossip","Guano Apes","Halestorm","Kasabian","Keane","Killswitch Engage","Korn","Lamb Of God","Linkin Park","Machine Head","Marilyn Manson","Metallica","Motörhead","The Offspring","Opeth","Periphery","Refused","Shinedown","Skrillex","Soundgarden","Tenacious D","The Subways","Trivium","While She Sleeps"],
-  2013:["30 Seconds To Mars","A Day To Remember","All Time Low","Alligatoah","Amon Amarth","ASAP Rocky","Asking Alexandria","Bad Religion","Biffy Clyro","Bring Me The Horizon","Broilers","Bullet For My Valentine","Bush","Casper","Coal Chamber","Coheed And Cambria","Escape The Fate","Fettes Brot","Five Finger Death Punch","Fun.","Green Day","Guano Apes","Hacktivist","Hollywood Undead","Hurts","Imagine Dragons","Kate Nash","Killswitch Engage","Korn","Kraftklub","Limp Bizkit","Newsted","Paramore","Papa Roach","Phoenix","Pierce The Veil","Royal Republic","Seeed","Selig","Simple Plan","Sportfreunde Stiller","Stereophonics","Stone Sour","The Bosshoss","The Bloody Beetroots","The Killers","The Prodigy","The Wombats","Thirty Seconds To Mars","Tocotronic","Volbeat"],
-  2014:["Alligatoah","Alter Bridge","Avenged Sevenfold","Babyshambles","Black Stone Cherry","Booka Shade","Die Fantastischen Vier","Fall Out Boy","Ghost","Gogol Bordello","Heaven Shall Burn","In Extremo","Iron Maiden","Jake Bugg","Jan Delay","John Newman","Karnivool","Kings Of Leon","Kraftklub","Kvelertak","Linkin Park","Mando Diao","Marteria","Mastodon","Maxïmo Park","Metallica","Milky Chance","Nine Inch Nails","Of Mice And Men","Opeth","Portugal. The Man","Powerman 5000","Queens Of The Stone Age","Rob Zombie","Royal Republic","Rudimental","SDP","Slayer","Suicide Silence","The Offspring","Trivium"],
-  2015:["A Day To Remember","Asking Alexandria","Bad Religion","Bastille","Beatsteaks","Billy Talent","Broilers","Body Count Feat. Ice-T","Die Toten Hosen","Donots","Eagles Of Death Metal","Enter Shikari","Foo Fighters","Godsmack","Halestorm","Hollywood Undead","In Flames","Interpol","K.I.Z","Kraftklub","Lamb Of God","Marilyn Manson","Motionless In White","Motörhead","Papa Roach","Parkway Drive","Rise Against","Royal Republic","Skindred","Slash","Slipknot","The Prodigy","Three Days Grace","While She Sleeps","Yellowcard","Zebrahead"],
-  2016:["Amon Amarth","Architects","Asking Alexandria","Avenged Sevenfold","Biffy Clyro","Billy Talent","Black Sabbath","Bring Me The Horizon","Broilers","Bullet For My Valentine","Die Toten Hosen","Donots","Electric Callboy","Five Finger Death Punch","Halestorm","Heaven Shall Burn","Hollywood Undead","Hurts","In Extremo","K.I.Z","Korn","Kraftklub","Maximo Park","Motörhead","Nothing But Thieves","Papa Roach","Red Hot Chili Peppers","Rise Against","Royal Republic","Shinedown","Slayer","Sum 41","The Prodigy","Trivium","Volbeat","While She Sleeps"],
-  2017:["30 Seconds To Mars","Airbourne","Alligatoah","Alter Bridge","Beatsteaks","Biffy Clyro","Bring Me The Horizon","Broilers","Die Toten Hosen","Donots","Five Finger Death Punch","Frank Turner","Hollywood Undead","Hurts","In Flames","K.I.Z","Kaiser Chiefs","Kraftklub","Macklemore And Ryan Lewis","Marilyn Manson","Muse","Nothing But Thieves","Parkway Drive","Pendulum","Rammstein","Rise Against","Shinedown","Slayer","System Of A Down","The Bosshoss","The Prodigy"],
-  2018:["30 Seconds To Mars","Asking Alexandria","Avenged Sevenfold","Bad Religion","Beatsteaks","Biffy Clyro","Black Stone Cherry","Body Count Feat. Ice-T","Broilers","Bullet For My Valentine","Die Toten Hosen","Electric Callboy","Enter Shikari","Five Finger Death Punch","Foo Fighters","Gorillaz","Halestorm","Heaven Shall Burn","Hollywood Undead","Muse","Nothing But Thieves","Papa Roach","Parkway Drive","Rise Against","Shinedown","Slipknot","Sum 41","The 1975"],
-  2019:["Alligatoah","Architects","Bad Religion","Bastille","Bring Me The Horizon","Die Ärzte","Five Finger Death Punch","Foo Fighters","Greta Van Fleet","Halestorm","Heaven Shall Burn","Killswitch Engage","Marteria And Casper","Nothing But Thieves","Prophets Of Rage","Refused","Rise Against","Slayer","Slipknot","Tenacious D","The Smashing Pumpkins","Tool","Trivium","While She Sleeps"],
-  2022:["A Day To Remember","Airbourne","Anthrax","Beatsteaks","Biffy Clyro","Billy Talent","Bring Me The Horizon","Broilers","Bullet For My Valentine","Deftones","Die Toten Hosen","Donots","Dropkick Murphys","Electric Callboy","Evanescence","Green Day","Halestorm","Heaven Shall Burn","In Extremo","K.I.Z","Korn","Kraftklub","Mastodon","Muse","Nothing But Thieves","Papa Roach","Royal Republic","Shinedown","Tenacious D","The Distillers","The Offspring","Three Days Grace","Volbeat","Weezer"],
-  2023:["Apache 207","Arch Enemy","Architects","Bring Me The Horizon","Bullet For My Valentine","Bury Tomorrow","Carpenter Brut","Charlotte Sands","Cleopatrick","Die Toten Hosen","Employed To Serve","Evanescence","Fever 333","Finch","Flogging Molly","Foo Fighters","Gojira","Halestorm","Hollywood Undead","Incubus","Jinjer","K.I.Z","Kings Of Leon","Kontra K","Limp Bizkit","Machine Gun Kelly","Mantar","Meshuggah","Motionless In White","NOFX","Nothing But Thieves","Papa Roach","Rise Against","Silverstein","Spiritbox","Steel Panther","Sum 41","Tenacious D","The Chats","Three Days Grace","Touche Amore","Turnstile"],
-  2024:["311","Against The Current","Antilopen Gang","Atreyu","Avenged Sevenfold","Babymetal","Beartooth","Betontod","Billy Talent","Biohazard","Blackout Problems","Body Count Feat. Ice-T","Broilers","Corey Taylor","Counterparts","Crosses","Die Ärzte","Dogstar","Donots","Dropkick Murphys","Electric Callboy","Enter Shikari","Fear Factory","Fit For A King","Green Day","Guano Apes","H-Blockx","Hanabie","Hatebreed","Kerry King","Kraftklub","Kreator","Kvelertak","Machine Head","Madsen","Måneskin","Neck Deep","Of Mice And Men","Parkway Drive","Pendulum","Pennywise","Polyphia","Queens Of The Stone Age","Royal Republic","Royal Blood","Skindred","The Interrupters","Thy Art Is Murder","Trettmann","Underoath","Wanda","While She Sleeps"],
-  2025:["A Day To Remember","Adam Angst","Airbourne","Beatsteaks","Biffy Clyro","Bring Me The Horizon","Bullet For My Valentine","Creeper","Deafheaven","Die Nerven","Drug Church","Electric Callboy","Evil Jared X Krogi","Falling In Reverse","Feine Sahne Fischfilet","Fit For An Autopsy","Frank Turner","Future Palace","Heaven Shall Burn","Holy Wars","Idles","Imminence","In Flames","Jinjer","K.I.Z","Kittie","Knocked Loose","Kontra K","Korn","Lorna Shore","Me First And The Gimme Gimmes","Millencolin","Myles Kennedy","Northlane","Nothing More","Pain Of Truth","Polaris","Poppy","Powerwolf","Rise Against","SDP","Slipknot","Spiritbox","The Prodigy","While She Sleeps"],
-  2026:["A Perfect Circle","Alter Bridge","Architects","Babymetal","Bad Omens","Breaking Benjamin","Bury Tomorrow","Bush","Electric Callboy","Hollywood Undead","Ice Nine Kills","Iron Maiden","Landmvrks","letlive.","Linkin Park","Limp Bizkit","Marteria","Mastodon","Palaye Royale","Papa Roach","Sabaton","Social Distortion","The Hives","The Offspring","The Pretty Reckless","Three Days Grace","Tom Morello","Trivium","Volbeat"],
-};
+async function loadCSV() {
+  try {
+    const resp = await fetch('bands.csv');
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const text = await resp.text();
+    parseCSV(text);
+  } catch(e) {
+    document.getElementById('band-list').innerHTML =
+      `<div class="loading-msg" style="color:var(--accent2)">Fehler: bands.csv nicht gefunden.<br>${e.message}</div>`;
+  }
+}
 
-// ── Build flat slot list ──────────────────────────────
-const ALL_SLOTS=[];
-for(const yr of YEARS) for(const band of RAW_DATA[yr]) ALL_SLOTS.push({id:`${band}__${yr}`,band,year:yr});
-ALL_SLOTS.sort((a,b)=>a.band.localeCompare(b.band)||a.year-b.year);
-const ALL_IDS=ALL_SLOTS.map(s=>s.id);
-const slotById={};
-for(const s of ALL_SLOTS) slotById[s.id]=s;
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  // skip header
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    // format: year,"band name"  or  year,band name
+    const m = line.match(/^(\d{4}),(.+)$/);
+    if (!m) continue;
+    const year = parseInt(m[1]);
+    const band = m[2].replace(/^"|"$/g, '').trim();
+    if (!band) continue;
+    ALL_SLOTS.push({ id: `${band}__${year}`, band, year });
+  }
+  ALL_SLOTS.sort((a, b) => a.band.localeCompare(b.band) || a.year - b.year);
+  ALL_IDS = ALL_SLOTS.map(s => s.id);
+  for (const s of ALL_SLOTS) slotById[s.id] = s;
+  YEARS = [...new Set(ALL_SLOTS.map(s => s.year))].sort((a,b) => a-b);
+  dataReady = true;
+  initApp();
+}
 
-// ══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // STATE
-// ranked: array of items, each item is string (single id) OR array of strings (tie group)
-// ties: within an item-array, all slots share the same rank number
-// Positions in ranked[] correspond to rank positions.
-// Rank of position i = i+1 regardless of group size.
-// ══════════════════════════════════════════════════════════
-let ranked   = [];   // array of (id | id[])
-let unranked = [...ALL_IDS];
+// ranked: array of (id | id[])  — ties = id[]
+// ═══════════════════════════════════════════════════
+let ranked   = [];
+let unranked = [];
 let activeYearFilter = null;
 let factor = 0;
-let dragSrc=null, dragSrcType=null;
+let dragSrc = null, dragSrcType = null;
 
-// ── helpers ───────────────────────────────────────────────
-// Flatten ranked to ordered list of ids (first of each group for rank)
-function flatRanked() {
-  return ranked.flatMap(r => Array.isArray(r) ? r : [r]);
-}
-function rankedIds() { return new Set(flatRanked()); }
-
-// rank number for a position index (= index+1, ties don't skip)
-function rankAt(idx) { return idx+1; }
-
-// rank number for a given id (finds its position)
+function flatRanked()  { return ranked.flatMap(r => Array.isArray(r) ? r : [r]); }
+function rankedIdsSet(){ return new Set(flatRanked()); }
+function rankAt(i)     { return i + 1; }
 function rankOf(id) {
-  for(let i=0;i<ranked.length;i++){
-    const r=ranked[i];
-    if(Array.isArray(r)?r.includes(id):r===id) return rankAt(i);
+  for (let i = 0; i < ranked.length; i++) {
+    const r = ranked[i];
+    if (Array.isArray(r) ? r.includes(id) : r === id) return rankAt(i);
   }
   return null;
 }
 
-// ── init ──────────────────────────────────────────────────
-function init(){
-  const saved=localStorage.getItem('rip3_ranking');
-  if(saved){
-    try{
-      const p=JSON.parse(saved);
-      // validate
-      ranked=p.ranked.map(r=>{
-        if(Array.isArray(r)) return r.filter(id=>ALL_IDS.includes(id));
-        return ALL_IDS.includes(r)?r:null;
-      }).filter(r=>r!==null&&(!Array.isArray(r)||r.length>0));
-      factor=p.factor||0;
-    }catch(e){ranked=[];factor=0;}
+function initApp() {
+  const saved = localStorage.getItem('rip3_ranking');
+  if (saved) {
+    try {
+      const p = JSON.parse(saved);
+      ranked = (p.ranked || []).map(r => {
+        if (Array.isArray(r)) return r.filter(id => ALL_IDS.includes(id));
+        return ALL_IDS.includes(r) ? r : null;
+      }).filter(r => r !== null && (!Array.isArray(r) || r.length > 0));
+      factor = p.factor || 0;
+    } catch(e) { ranked = []; factor = 0; }
   }
-  unranked=ALL_IDS.filter(id=>!rankedIds().has(id));
-  document.getElementById('factor-slider').value=factor;
+  unranked = ALL_IDS.filter(id => !rankedIdsSet().has(id));
+  document.getElementById('factor-slider').value = factor;
+  document.getElementById('factor-display').textContent = factor.toFixed(2);
   buildYearFilters();
   renderBandList();
   renderRanked();
   renderStats();
 }
 
-function save(){
-  try{localStorage.setItem('rip3_ranking',JSON.stringify({ranked,factor}));}catch(e){}
+function save() {
+  try { localStorage.setItem('rip3_ranking', JSON.stringify({ ranked, factor })); } catch(e) {}
 }
 
-// ── Year filter ───────────────────────────────────────────
-function buildYearFilters(){
-  const wrap=document.getElementById('year-filters');
-  wrap.innerHTML='';
-  const mk=(lbl,yr)=>{
-    const b=document.createElement('button');
-    b.className='year-btn'+(activeYearFilter===yr?' active':'');
-    b.textContent=lbl;
-    b.onclick=()=>{activeYearFilter=activeYearFilter===yr?null:yr;buildYearFilters();renderBandList();};
+// ═══════════════════════════════════════════════════
+// YEAR FILTERS
+// ═══════════════════════════════════════════════════
+function buildYearFilters() {
+  const wrap = document.getElementById('year-filters');
+  wrap.innerHTML = '';
+  const mk = (lbl, yr) => {
+    const b = document.createElement('button');
+    b.className = 'year-btn' + (activeYearFilter === yr ? ' active' : '');
+    b.textContent = lbl;
+    b.onclick = () => { activeYearFilter = activeYearFilter === yr ? null : yr; buildYearFilters(); renderBandList(); };
     wrap.appendChild(b);
   };
-  mk('Alle',null);
-  YEARS.forEach(yr=>mk(yr,yr));
+  mk('Alle', null);
+  YEARS.forEach(yr => mk(yr, yr));
 }
 
-// ── Left panel ────────────────────────────────────────────
-function renderBandList(){
-  const list=document.getElementById('band-list');
-  const q=document.getElementById('search').value.trim().toLowerCase();
-  const rids=rankedIds();
-  list.innerHTML='';
-  let count=0;
-  for(const id of unranked){
-    const s=slotById[id];
-    if(activeYearFilter!==null&&s.year!==activeYearFilter) continue;
-    if(q&&!s.band.toLowerCase().includes(q)&&!String(s.year).includes(q)) continue;
-    const el=document.createElement('div');
-    el.className='band-item';
-    el.draggable=true;
-    el.dataset.id=id;
-    el.innerHTML=`<span class="drag-handle">⠿</span><span class="item-name">${s.band}</span><span class="item-year">${s.year}</span>`;
-    el.addEventListener('dragstart',e=>onUnrankedDragStart(e,id));
-    el.addEventListener('dragend',onDragEnd);
-    el.addEventListener('dblclick',()=>addSlot(id));
+// ═══════════════════════════════════════════════════
+// LEFT PANEL
+// ═══════════════════════════════════════════════════
+function renderBandList() {
+  if (!dataReady) return;
+  const list = document.getElementById('band-list');
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  list.innerHTML = '';
+  for (const id of unranked) {
+    const s = slotById[id];
+    if (activeYearFilter !== null && s.year !== activeYearFilter) continue;
+    if (q && !s.band.toLowerCase().includes(q) && !String(s.year).includes(q)) continue;
+    const el = document.createElement('div');
+    el.className = 'band-item';
+    el.draggable = true;
+    el.dataset.id = id;
+    el.innerHTML = `<span class="drag-handle">⠿</span><span class="item-name">${s.band}</span><span class="item-year">${s.year}</span>`;
+    el.addEventListener('dragstart', e => onUnrankedDragStart(e, id));
+    el.addEventListener('dragend', onDragEnd);
+    el.addEventListener('dblclick', () => addSlot(id));
     list.appendChild(el);
-    count++;
   }
-  document.getElementById('unranked-count').textContent=unranked.length;
+  document.getElementById('unranked-count').textContent = unranked.length;
 }
 
-// ── Center panel ──────────────────────────────────────────
-function renderRanked(){
-  const zone=document.getElementById('drop-zone');
-  document.getElementById('drop-empty').style.display=ranked.length===0?'flex':'none';
-  zone.querySelectorAll('.rank-group').forEach(el=>el.remove());
+// ═══════════════════════════════════════════════════
+// CENTER PANEL
+// ═══════════════════════════════════════════════════
+function renderRanked() {
+  const zone = document.getElementById('drop-zone');
+  document.getElementById('drop-empty').style.display = ranked.length === 0 ? 'flex' : 'none';
+  zone.querySelectorAll('.rank-group').forEach(el => el.remove());
 
-  let totalSlots=0;
-  ranked.forEach((r,posIdx)=>{
-    const ids=Array.isArray(r)?r:[r];
-    const rank=rankAt(posIdx);
-    const group=document.createElement('div');
-    group.className='rank-group';
-    group.dataset.pos=posIdx;
+  let totalSlots = 0;
+  ranked.forEach((r, posIdx) => {
+    const ids = Array.isArray(r) ? r : [r];
+    const rank = rankAt(posIdx);
+    const group = document.createElement('div');
+    group.className = 'rank-group';
+    group.dataset.pos = posIdx;
 
-    ids.forEach((id,tieIdx)=>{
-      const s=slotById[id];
-      const isTie=tieIdx>0;
-      const el=document.createElement('div');
-      el.className='ranked-item'+(isTie?' is-tie':'');
-      el.draggable=true;
-      el.dataset.id=id;
-      el.dataset.pos=posIdx;
+    ids.forEach((id, tieIdx) => {
+      const s = slotById[id];
+      const isTie = tieIdx > 0;
+      const el = document.createElement('div');
+      el.className = 'ranked-item' + (isTie ? ' is-tie' : '');
+      el.draggable = true;
+      el.dataset.id = id;
+      el.dataset.pos = posIdx;
 
-      const rankClass=rank<=3?'top3':rank<=10?'top10':'';
-      const lbl=isTie?'=':rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank;
+      const rankClass = rank <= 3 ? 'top3' : rank <= 10 ? 'top10' : '';
+      const lbl = isTie ? '=' : rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
 
-      // tie button: shown on non-first items to untie; on all items to tie with above
-      // First item: show "= ↑" button to tie with position above (if pos>0)
-      // Non-first items: show "≠" to untie from group
-      let tieBtn='';
-      if(isTie){
-        tieBtn=`<button class="tie-btn active" title="Gleichstand aufheben" data-action="untie" data-id="${id}" data-pos="${posIdx}">≠</button>`;
-      } else if(posIdx>0){
-        tieBtn=`<button class="tie-btn" title="Mit darüber gleichstellen" data-action="tie" data-pos="${posIdx}">= ↑</button>`;
+      let tieBtn = '';
+      if (isTie) {
+        tieBtn = `<button class="tie-btn active" title="Gleichstand aufheben" data-action="untie" data-id="${id}" data-pos="${posIdx}">≠</button>`;
+      } else if (posIdx > 0) {
+        tieBtn = `<button class="tie-btn" title="Mit darüber gleichstellen" data-action="tie" data-pos="${posIdx}">= ↑</button>`;
       }
 
-      el.innerHTML=`
+      el.innerHTML = `
         <span class="rank-num ${rankClass}">${lbl}</span>
         <span class="ranked-name">${s.band}</span>
         <span class="ranked-year-badge">${s.year}</span>
         ${tieBtn}
         <button class="remove-btn" data-id="${id}">✕</button>
       `;
-      el.querySelector('.remove-btn').addEventListener('click',()=>removeSlot(id));
-      if(tieBtn){
-        const tb=el.querySelector('.tie-btn');
-        tb.addEventListener('click',e=>{
+      el.querySelector('.remove-btn').addEventListener('click', () => removeSlot(id));
+      if (tieBtn) {
+        const tb = el.querySelector('.tie-btn');
+        tb.addEventListener('click', e => {
           e.stopPropagation();
-          if(tb.dataset.action==='tie') tiePosition(posIdx);
-          else untieSlot(id,posIdx);
+          if (tb.dataset.action === 'tie') tiePosition(posIdx);
+          else untieSlot(id, posIdx);
         });
       }
-      el.addEventListener('dragstart',e=>onRankedDragStart(e,id,posIdx));
-      el.addEventListener('dragend',onDragEnd);
-      el.addEventListener('dragover',e=>onRankedItemDragOver(e,el,posIdx));
-      el.addEventListener('drop',e=>onRankedItemDrop(e,posIdx));
+      el.addEventListener('dragstart', e => onRankedDragStart(e, id, posIdx));
+      el.addEventListener('dragend', onDragEnd);
+      el.addEventListener('dragover', e => onRankedItemDragOver(e, el, posIdx));
+      el.addEventListener('drop', e => onRankedItemDrop(e, posIdx));
       group.appendChild(el);
       totalSlots++;
     });
     zone.appendChild(group);
   });
-
-  document.getElementById('ranked-count').textContent=totalSlots;
+  document.getElementById('ranked-count').textContent = totalSlots;
 }
 
-// ── Tie operations ────────────────────────────────────────
-// Merge position posIdx into posIdx-1
-function tiePosition(posIdx){
-  if(posIdx<=0) return;
-  const above=ranked[posIdx-1];
-  const curr=ranked[posIdx];
-  const aboveArr=Array.isArray(above)?above:[above];
-  const currArr=Array.isArray(curr)?curr:[curr];
-  ranked.splice(posIdx-1,2,[...aboveArr,...currArr]);
+// ═══════════════════════════════════════════════════
+// TIE OPS
+// ═══════════════════════════════════════════════════
+function tiePosition(posIdx) {
+  if (posIdx <= 0) return;
+  const above = ranked[posIdx - 1];
+  const curr  = ranked[posIdx];
+  const aboveArr = Array.isArray(above) ? above : [above];
+  const currArr  = Array.isArray(curr)  ? curr  : [curr];
+  ranked.splice(posIdx - 1, 2, [...aboveArr, ...currArr]);
+  save(); renderRanked(); renderStats();
+}
+function untieSlot(id, posIdx) {
+  const r = ranked[posIdx];
+  if (!Array.isArray(r)) return;
+  const newGroup = r.filter(x => x !== id);
+  ranked.splice(posIdx, 1, ...(newGroup.length > 1 ? [newGroup] : [newGroup[0]]), id);
   save(); renderRanked(); renderStats();
 }
 
-// Remove id from its tie group; if group becomes size 1, unwrap
-function untieSlot(id,posIdx){
-  const r=ranked[posIdx];
-  if(!Array.isArray(r)) return;
-  const newGroup=r.filter(x=>x!==id);
-  // put the untied id as new position after the group
-  ranked.splice(posIdx,1,...(newGroup.length>1?[newGroup]:[newGroup[0]]),id);
-  save(); renderRanked(); renderStats();
-}
-
-// ── Slot operations ───────────────────────────────────────
-function addSlot(id, atPos=null){
-  if(rankedIds().has(id)) return;
-  unranked=unranked.filter(x=>x!==id);
-  if(atPos!==null) ranked.splice(atPos,0,id);
-  else ranked.push(id);
+// ═══════════════════════════════════════════════════
+// SLOT OPS
+// ═══════════════════════════════════════════════════
+function addSlot(id, atPos = null) {
+  if (rankedIdsSet().has(id)) return;
+  unranked = unranked.filter(x => x !== id);
+  atPos !== null ? ranked.splice(atPos, 0, id) : ranked.push(id);
   save(); renderBandList(); renderRanked(); renderStats();
-  if(atPos===null){const z=document.getElementById('drop-zone');z.scrollTop=z.scrollHeight;}
+  if (atPos === null) { const z = document.getElementById('drop-zone'); z.scrollTop = z.scrollHeight; }
 }
-
-function removeSlot(id){
-  const posIdx=ranked.findIndex(r=>Array.isArray(r)?r.includes(id):r===id);
-  if(posIdx===-1) return;
-  const r=ranked[posIdx];
-  if(Array.isArray(r)){
-    const newG=r.filter(x=>x!==id);
-    if(newG.length===1) ranked.splice(posIdx,1,newG[0]);
-    else if(newG.length>1) ranked.splice(posIdx,1,newG);
-    else ranked.splice(posIdx,1);
-  } else {
-    ranked.splice(posIdx,1);
-  }
-  unranked=ALL_IDS.filter(x=>!rankedIds().has(x));
+function removeSlot(id) {
+  const posIdx = ranked.findIndex(r => Array.isArray(r) ? r.includes(id) : r === id);
+  if (posIdx === -1) return;
+  const r = ranked[posIdx];
+  if (Array.isArray(r)) {
+    const newG = r.filter(x => x !== id);
+    if (newG.length === 1) ranked.splice(posIdx, 1, newG[0]);
+    else if (newG.length > 1) ranked.splice(posIdx, 1, newG);
+    else ranked.splice(posIdx, 1);
+  } else ranked.splice(posIdx, 1);
+  unranked = ALL_IDS.filter(x => !rankedIdsSet().has(x));
   save(); renderBandList(); renderRanked(); renderStats();
 }
-
-function clearAll(){
-  if(!confirm('Gesamtes Ranking zurücksetzen?')) return;
-  ranked=[]; unranked=[...ALL_IDS];
+function removeFromRankedOnly(id) {
+  const posIdx = ranked.findIndex(r => Array.isArray(r) ? r.includes(id) : r === id);
+  if (posIdx === -1) return;
+  const r = ranked[posIdx];
+  if (Array.isArray(r)) {
+    const newG = r.filter(x => x !== id);
+    if (newG.length === 1) ranked.splice(posIdx, 1, newG[0]);
+    else if (newG.length > 1) ranked.splice(posIdx, 1, newG);
+    else ranked.splice(posIdx, 1);
+  } else ranked.splice(posIdx, 1);
+}
+function clearAll() {
+  if (!confirm('Gesamtes Ranking zurücksetzen?')) return;
+  ranked = []; unranked = [...ALL_IDS];
   save(); renderBandList(); renderRanked(); renderStats();
   showToast('Ranking zurückgesetzt');
 }
 
-// ── Stats ─────────────────────────────────────────────────
-function onFactorChange(){
-  factor=parseFloat(document.getElementById('factor-slider').value);
-  document.getElementById('factor-display').textContent=factor.toFixed(2);
+// ═══════════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════════
+function onFactorChange() {
+  factor = parseFloat(document.getElementById('factor-slider').value);
+  document.getElementById('factor-display').textContent = factor.toFixed(2);
   save(); renderStats();
 }
 
-function computeStats(){
-  // For each ranked slot: effective rank = rankOf(id) (position-based, ties share same rank)
-  const yearData=YEARS.map(yr=>{
-    const slotsInYear=flatRanked().filter(id=>slotById[id].year===yr);
-    if(!slotsInYear.length) return{yr,avg:null,adjAvg:null,count:0};
-    const avg=slotsInYear.reduce((s,id)=>s+rankOf(id),0)/slotsInYear.length;
-    return{yr,avg,adjAvg:null,count:slotsInYear.length};
+function computeStats() {
+  const yearData = YEARS.map(yr => {
+    const sl = flatRanked().filter(id => slotById[id].year === yr);
+    if (!sl.length) return { yr, avg: null, adjAvg: null, count: 0 };
+    const avg = sl.reduce((s, id) => s + rankOf(id), 0) / sl.length;
+    return { yr, avg, adjAvg: null, count: sl.length };
   });
-
-  const withData=yearData.filter(d=>d.avg!==null);
-  if(!withData.length) return yearData;
-
-  // avg bands per year across all ranked years
-  const avgCount=withData.reduce((s,d)=>s+d.count,0)/withData.length;
-
-  // apply factor
-  withData.forEach(d=>{
-    const deviation=d.count-avgCount;  // positive = more bands than avg → bonus (subtract from rank)
-    d.adjAvg=d.avg - deviation*factor;
-  });
-
+  const withData = yearData.filter(d => d.avg !== null);
+  if (!withData.length) return yearData;
+  const avgCount = withData.reduce((s, d) => s + d.count, 0) / withData.length;
+  withData.forEach(d => { d.adjAvg = d.avg - (d.count - avgCount) * factor; });
   return yearData;
 }
 
-function renderStats(){
-  const content=document.getElementById('stats-content');
-  const totalRanked=flatRanked().length;
-
-  if(!totalRanked){
-    content.innerHTML='<div class="no-stats">Noch nichts gerankt.</div>';
-    document.getElementById('factor-hint').textContent='Faktor 0 = kein Einfluss der Bandanzahl';
+function renderStats() {
+  const content = document.getElementById('stats-content');
+  if (!flatRanked().length) {
+    content.innerHTML = '<div class="no-stats">Noch nichts gerankt.</div>';
+    document.getElementById('factor-hint').textContent = 'Faktor 0 = kein Einfluss der Bandanzahl';
     return;
   }
+  const yearData = computeStats();
+  const withData = yearData.filter(d => d.avg !== null);
+  const noData   = yearData.filter(d => d.avg === null);
+  const avgCount = withData.length ? withData.reduce((s, d) => s + d.count, 0) / withData.length : 0;
+  document.getElementById('factor-hint').textContent =
+    `Ø ${avgCount.toFixed(1)} Auftritte/Jahr · Faktor: ${factor.toFixed(2)}`;
 
-  const yearData=computeStats();
-  const withData=yearData.filter(d=>d.avg!==null);
-  const noData=yearData.filter(d=>d.avg===null);
-
-  // avg ranked count info
-  const avgCount=withData.length?withData.reduce((s,d)=>s+d.count,0)/withData.length:0;
-  document.getElementById('factor-hint').textContent=
-    `Ø ${avgCount.toFixed(1)} Auftritte/Jahr gerankt · Faktor: ${factor.toFixed(2)}`;
-
-  // sort by adjusted avg (or raw avg if factor=0)
-  const sorted=[...withData].sort((a,b)=>(a.adjAvg??a.avg)-(b.adjAvg??b.avg));
-  const maxScore=Math.max(...sorted.map(d=>d.adjAvg??d.avg),1);
-
-  content.innerHTML='';
-  if(sorted.length){
-    const hdr=document.createElement('div');
-    hdr.style.cssText='font-size:.58rem;color:var(--muted);padding:3px 2px 6px;letter-spacing:.1em;';
-    hdr.textContent='↑ BESTES JAHR ZUERST'+(factor>0?' (FAKTOR AKTIV)':'');
+  const sorted  = [...withData].sort((a, b) => (a.adjAvg ?? a.avg) - (b.adjAvg ?? b.avg));
+  const maxScore = Math.max(...sorted.map(d => d.adjAvg ?? d.avg), 1);
+  content.innerHTML = '';
+  if (sorted.length) {
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'font-size:.58rem;color:var(--muted);padding:3px 2px 6px;letter-spacing:.1em;';
+    hdr.textContent = '↑ BESTES JAHR ZUERST' + (factor > 0 ? ' (FAKTOR AKTIV)' : '');
     content.appendChild(hdr);
-    sorted.forEach(d=>content.appendChild(buildStatEl(d,maxScore,avgCount)));
+    sorted.forEach(d => content.appendChild(buildStatEl(d, maxScore, avgCount)));
   }
-  if(noData.length){
-    const sep=document.createElement('div');
-    sep.style.cssText='font-size:.58rem;color:var(--muted);padding:7px 2px 3px;letter-spacing:.1em;';
-    sep.textContent='KEINE GERANKTEN AUFTRITTE:';
+  if (noData.length) {
+    const sep = document.createElement('div');
+    sep.style.cssText = 'font-size:.58rem;color:var(--muted);padding:7px 2px 3px;letter-spacing:.1em;';
+    sep.textContent = 'KEINE GERANKTEN AUFTRITTE:';
     content.appendChild(sep);
-    noData.forEach(d=>content.appendChild(buildStatEl(d,maxScore,avgCount)));
+    noData.forEach(d => content.appendChild(buildStatEl(d, maxScore, avgCount)));
   }
 }
 
-function buildStatEl(d,maxScore,avgCount){
-  const el=document.createElement('div');
-  el.className='year-stat'+(d.avg!==null?' has-data':'');
-  if(d.avg!==null){
-    const score=d.adjAvg??d.avg;
-    const barPct=Math.max(4,100-(score/maxScore)*80);
-    const deviation=d.count-avgCount;
-    let adjHtml='';
-    if(factor>0&&Math.abs(deviation)>0.01){
-      const sign=deviation>0?'▲':'▼';
-      adjHtml=`<span class="adj-score">${sign}${Math.abs(deviation*factor).toFixed(1)}</span>`;
+function buildStatEl(d, maxScore, avgCount) {
+  const el = document.createElement('div');
+  el.className = 'year-stat' + (d.avg !== null ? ' has-data' : '');
+  if (d.avg !== null) {
+    const score  = d.adjAvg ?? d.avg;
+    const barPct = Math.max(4, 100 - (score / maxScore) * 80);
+    const deviation = d.count - avgCount;
+    let adjHtml = '';
+    if (factor > 0 && Math.abs(deviation) > 0.01) {
+      adjHtml = `<span class="adj-score">${deviation > 0 ? '▲' : '▼'}${Math.abs(deviation * factor).toFixed(1)}</span>`;
     }
-    el.innerHTML=`
+    el.innerHTML = `
       <div class="year-stat-header">
         <span class="year-label">${d.yr}</span>
         <span class="ranked-count">${d.count}×</span>
         <span class="avg-score">Ø ${score.toFixed(1)}${adjHtml}</span>
       </div>
       <div class="bar-wrap"><div class="bar-fill" style="width:${barPct}%"></div></div>`;
-    el.title=`Roh-Ø: ${d.avg.toFixed(2)} · ${d.count} Auftritte gerankt (Ø ${avgCount.toFixed(1)}) · Korr: ${(d.adjAvg-d.avg).toFixed(2)}`;
+    el.title = `Roh-Ø: ${d.avg.toFixed(2)} · ${d.count} Auftritte (Ø ${avgCount.toFixed(1)}) · Korr: ${((d.adjAvg ?? d.avg) - d.avg).toFixed(2)}`;
   } else {
-    el.innerHTML=`<div class="year-stat-header"><span class="year-label">${d.yr}</span><span class="ranked-count">—</span></div>`;
+    el.innerHTML = `<div class="year-stat-header"><span class="year-label">${d.yr}</span><span class="ranked-count">—</span></div>`;
   }
   return el;
 }
 
-// ── Drag & Drop ───────────────────────────────────────────
-function onUnrankedDragStart(e,id){
-  dragSrc=id;dragSrcType='unranked';
-  e.dataTransfer.effectAllowed='move';
-  e.dataTransfer.setData('text/plain',id);
-  setTimeout(()=>{const el=document.querySelector(`.band-item[data-id="${CSS.escape(id)}"]`);if(el)el.classList.add('dragging');},0);
-  showGhost(`${slotById[id].band} · ${slotById[id].year}`,e);
+// ═══════════════════════════════════════════════════
+// DRAG & DROP
+// ═══════════════════════════════════════════════════
+function onUnrankedDragStart(e, id) {
+  dragSrc = id; dragSrcType = 'unranked';
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', id);
+  setTimeout(() => { const el = document.querySelector(`.band-item[data-id="${CSS.escape(id)}"]`); if (el) el.classList.add('dragging'); }, 0);
+  showGhost(`${slotById[id].band} · ${slotById[id].year}`, e);
 }
-function onRankedDragStart(e,id,posIdx){
-  dragSrc=id;dragSrcType='ranked';
-  e.dataTransfer.effectAllowed='move';
-  e.dataTransfer.setData('text/plain',id);
-  setTimeout(()=>{const el=document.querySelector(`.ranked-item[data-id="${CSS.escape(id)}"]`);if(el)el.classList.add('dragging');},0);
-  showGhost(`${slotById[id].band} · ${slotById[id].year}`,e);
+function onRankedDragStart(e, id) {
+  dragSrc = id; dragSrcType = 'ranked';
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', id);
+  setTimeout(() => { const el = document.querySelector(`.ranked-item[data-id="${CSS.escape(id)}"]`); if (el) el.classList.add('dragging'); }, 0);
+  showGhost(`${slotById[id].band} · ${slotById[id].year}`, e);
 }
-function onDragEnd(){
-  dragSrc=null;dragSrcType=null;
-  document.querySelectorAll('.dragging,.drop-above').forEach(el=>el.classList.remove('dragging','drop-above'));
+function onDragEnd() {
+  dragSrc = null; dragSrcType = null;
+  document.querySelectorAll('.dragging,.drop-above').forEach(el => el.classList.remove('dragging', 'drop-above'));
   hideGhost();
 }
-function onZoneDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';document.getElementById('drop-zone').classList.add('drag-over');}
-function onZoneDragLeave(e){document.getElementById('drop-zone').classList.remove('drag-over');}
-function onZoneDrop(e){
+function onZoneDragOver(e)  { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; document.getElementById('drop-zone').classList.add('drag-over'); }
+function onZoneDragLeave(e) { document.getElementById('drop-zone').classList.remove('drag-over'); }
+function onZoneDrop(e) {
   e.preventDefault();
   document.getElementById('drop-zone').classList.remove('drag-over');
-  const id=e.dataTransfer.getData('text/plain');
-  if(!id||!slotById[id]) return;
-  if(dragSrcType==='unranked'){addSlot(id);}
-  else if(dragSrcType==='ranked'){
-    // move to end: remove from current pos, push as new position
-    removeFromRankedOnly(id);
-    ranked.push(id);
-    unranked=ALL_IDS.filter(x=>!rankedIds().has(x));
-    save();renderBandList();renderRanked();renderStats();
+  const id = e.dataTransfer.getData('text/plain');
+  if (!id || !slotById[id]) return;
+  if (dragSrcType === 'unranked') { addSlot(id); }
+  else if (dragSrcType === 'ranked') { removeFromRankedOnly(id); ranked.push(id); unranked = ALL_IDS.filter(x => !rankedIdsSet().has(x)); save(); renderBandList(); renderRanked(); renderStats(); }
+}
+function onRankedItemDragOver(e, el, posIdx) {
+  e.preventDefault(); e.stopPropagation();
+  if (dragSrc && dragSrc !== el.dataset.id) {
+    document.querySelectorAll('.drop-above').forEach(x => x.classList.remove('drop-above'));
+    const group = document.querySelector(`.rank-group[data-pos="${posIdx}"]`);
+    if (group) { const first = group.querySelector('.ranked-item'); if (first) first.classList.add('drop-above'); }
   }
 }
-function onRankedItemDragOver(e,el,posIdx){
-  e.preventDefault();e.stopPropagation();
-  if(dragSrc&&dragSrc!==el.dataset.id){
-    document.querySelectorAll('.drop-above').forEach(x=>x.classList.remove('drop-above'));
-    // highlight first item of the group
-    const group=document.querySelector(`.rank-group[data-pos="${posIdx}"]`);
-    if(group){const first=group.querySelector('.ranked-item');if(first)first.classList.add('drop-above');}
-  }
-}
-function onRankedItemDrop(e,targetPos){
-  e.preventDefault();e.stopPropagation();
-  const id=e.dataTransfer.getData('text/plain');
-  if(!id||!slotById[id]) return;
+function onRankedItemDrop(e, targetPos) {
+  e.preventDefault(); e.stopPropagation();
+  const id = e.dataTransfer.getData('text/plain');
+  if (!id || !slotById[id]) return;
   document.getElementById('drop-zone').classList.remove('drag-over');
-  document.querySelectorAll('.drop-above').forEach(el=>el.classList.remove('drop-above'));
-
-  if(dragSrcType==='unranked'){
-    unranked=unranked.filter(x=>x!==id);
-    ranked.splice(targetPos,0,id);
-  } else if(dragSrcType==='ranked'){
-    const srcPos=ranked.findIndex(r=>Array.isArray(r)?r.includes(id):r===id);
-    if(srcPos===-1||srcPos===targetPos) return;
+  document.querySelectorAll('.drop-above').forEach(el => el.classList.remove('drop-above'));
+  if (dragSrcType === 'unranked') {
+    unranked = unranked.filter(x => x !== id);
+    ranked.splice(targetPos, 0, id);
+  } else if (dragSrcType === 'ranked') {
+    const srcPos = ranked.findIndex(r => Array.isArray(r) ? r.includes(id) : r === id);
+    if (srcPos === -1 || srcPos === targetPos) return;
     removeFromRankedOnly(id);
-    const newTarget=srcPos<targetPos?targetPos-1:targetPos;
-    ranked.splice(newTarget,0,id);
+    ranked.splice(srcPos < targetPos ? targetPos - 1 : targetPos, 0, id);
   }
-  save();renderBandList();renderRanked();renderStats();
+  save(); renderBandList(); renderRanked(); renderStats();
 }
 
-// Remove id from ranked[] without touching unranked (used during drag reorder)
-function removeFromRankedOnly(id){
-  const posIdx=ranked.findIndex(r=>Array.isArray(r)?r.includes(id):r===id);
-  if(posIdx===-1) return;
-  const r=ranked[posIdx];
-  if(Array.isArray(r)){
-    const newG=r.filter(x=>x!==id);
-    if(newG.length===1) ranked.splice(posIdx,1,newG[0]);
-    else if(newG.length>1) ranked.splice(posIdx,1,newG);
-    else ranked.splice(posIdx,1);
-  } else ranked.splice(posIdx,1);
+// ═══════════════════════════════════════════════════
+// GHOST
+// ═══════════════════════════════════════════════════
+function showGhost(text, e) {
+  const g = document.getElementById('drag-ghost');
+  g.textContent = text; g.style.display = 'block'; moveGhost(e);
+  document.addEventListener('dragover', moveGhost);
 }
+function moveGhost(e) { const g = document.getElementById('drag-ghost'); g.style.left = e.clientX+'px'; g.style.top = e.clientY+'px'; }
+function hideGhost()  { document.removeEventListener('dragover', moveGhost); document.getElementById('drag-ghost').style.display = 'none'; }
 
-function showGhost(text,e){
-  const g=document.getElementById('drag-ghost');
-  g.textContent=text;g.style.display='block';moveGhost(e);
-  document.addEventListener('dragover',moveGhost);
-}
-function moveGhost(e){const g=document.getElementById('drag-ghost');g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';}
-function hideGhost(){document.removeEventListener('dragover',moveGhost);document.getElementById('drag-ghost').style.display='none';}
-
-// ── Export / Import ───────────────────────────────────────
-function exportRanking(){
-  if(!ranked.length){showToast('Noch nichts zu exportieren!');return;}
-  const lines=['# Rock im Park Rangliste',''];
-  let pos=0;
-  for(const r of ranked){
+// ═══════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ═══════════════════════════════════════════════════
+function exportRanking() {
+  if (!ranked.length) { showToast('Noch nichts zu exportieren!'); return; }
+  const lines = ['# Rock im Park Rangliste', ''];
+  let pos = 0;
+  for (const r of ranked) {
     pos++;
-    const ids=Array.isArray(r)?r:[r];
-    ids.forEach((id,i)=>{
-      const s=slotById[id];
-      lines.push(`${i===0?pos:'='} ${s.band} — ${s.year}`);
-    });
+    const ids = Array.isArray(r) ? r : [r];
+    ids.forEach((id, i) => { const s = slotById[id]; lines.push(`${i === 0 ? pos : '='} ${s.band} — ${s.year}`); });
   }
-  const stats=computeStats();
-  lines.push('','# Jahres-Ø (niedrig = besser):');
-  stats.filter(d=>d.avg!==null).sort((a,b)=>(a.adjAvg??a.avg)-(b.adjAvg??b.avg))
-    .forEach(d=>lines.push(`${d.yr}: Ø ${(d.adjAvg??d.avg).toFixed(2)}  (${d.count} Auftritte, Faktor ${factor.toFixed(2)})`));
-  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'})),download:'rip-rangliste.txt'});
-  a.click();URL.revokeObjectURL(a.href);
+  const stats = computeStats();
+  lines.push('', '# Jahres-Ø (niedrig = besser):');
+  stats.filter(d => d.avg !== null).sort((a, b) => (a.adjAvg ?? a.avg) - (b.adjAvg ?? b.avg))
+    .forEach(d => lines.push(`${d.yr}: Ø ${(d.adjAvg ?? d.avg).toFixed(2)}  (${d.count} Auftritte, Faktor ${factor.toFixed(2)})`));
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' })),
+    download: 'rip-rangliste.txt'
+  });
+  a.click(); URL.revokeObjectURL(a.href);
   showToast('Export gespeichert!');
 }
 
-function triggerImport(){document.getElementById('import-input').value='';document.getElementById('import-input').click();}
+function triggerImport() { document.getElementById('import-input').value = ''; document.getElementById('import-input').click(); }
 
-function importRanking(e){
-  const file=e.target.files[0];if(!file) return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    const newRanked=[];
-    let currentGroup=null;
-    for(const line of ev.target.result.split('\n')){
-      const ranked_m=line.match(/^(\d+)\s+(.+?)\s+[—\-–]\s+(\d{4})/);
-      const tie_m=line.match(/^=\s+(.+?)\s+[—\-–]\s+(\d{4})/);
-      if(ranked_m){
-        if(currentGroup) newRanked.push(currentGroup.length===1?currentGroup[0]:currentGroup);
-        const id=`${ranked_m[2].trim()}__${parseInt(ranked_m[3])}`;
-        currentGroup=slotById[id]?[id]:[];
-      } else if(tie_m&&currentGroup){
-        const id=`${tie_m[1].trim()}__${parseInt(tie_m[2])}`;
-        if(slotById[id]) currentGroup.push(id);
+function importRanking(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const newRanked = [];
+    let currentGroup = null;
+    for (const line of ev.target.result.split('\n')) {
+      const rm = line.match(/^(\d+)\s+(.+?)\s+[—\-–]\s+(\d{4})/);
+      const tm = line.match(/^=\s+(.+?)\s+[—\-–]\s+(\d{4})/);
+      if (rm) {
+        if (currentGroup) newRanked.push(currentGroup.length === 1 ? currentGroup[0] : currentGroup);
+        const id = `${rm[2].trim()}__${parseInt(rm[3])}`;
+        currentGroup = slotById[id] ? [id] : [];
+      } else if (tm && currentGroup) {
+        const id = `${tm[1].trim()}__${parseInt(tm[2])}`;
+        if (slotById[id]) currentGroup.push(id);
       }
     }
-    if(currentGroup) newRanked.push(currentGroup.length===1?currentGroup[0]:currentGroup);
-    const total=newRanked.flatMap(r=>Array.isArray(r)?r:[r]).length;
-    if(!total){showToast('Keine Einträge erkannt!');return;}
-    if(ranked.length&&!confirm(`Ranking (${flatRanked().length}) ersetzen durch Import (${total})?`)) return;
-    ranked=newRanked;
-    unranked=ALL_IDS.filter(x=>!rankedIds().has(x));
-    save();renderBandList();renderRanked();renderStats();
+    if (currentGroup) newRanked.push(currentGroup.length === 1 ? currentGroup[0] : currentGroup);
+    const total = newRanked.flatMap(r => Array.isArray(r) ? r : [r]).length;
+    if (!total) { showToast('Keine Einträge erkannt!'); return; }
+    if (ranked.length && !confirm(`Ranking (${flatRanked().length}) ersetzen durch Import (${total})?`)) return;
+    ranked  = newRanked;
+    unranked = ALL_IDS.filter(x => !rankedIdsSet().has(x));
+    save(); renderBandList(); renderRanked(); renderStats();
     showToast(`${total} Auftritte importiert ✓`);
   };
   reader.readAsText(file);
 }
 
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2200);
+// ═══════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-init();
+// ═══════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════
+loadCSV();
 </script>
 </body>
 </html>
