@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rock im Park Ranker — 2008–2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--surface:#111;--surface2:#1a1a1a;--border:#2a2a2a;--accent:#e8ff00;--accent2:#ff4400;--text:#f0f0f0;--muted:#555;--ranked-bg:#141f00;--ranked-border:#3a5500;--tie-bg:#1a1800;--tie-border:#443800;--spotify:#1DB954;--lastfm:#d51007;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh;overflow-x:hidden;}
+header{border-bottom:2px solid var(--accent);padding:14px 24px;display:flex;align-items:center;gap:16px;background:var(--surface);position:sticky;top:0;z-index:100;}
+header h1{font-family:'Black Han Sans',sans-serif;font-size:clamp(1.1rem,2.2vw,1.8rem);letter-spacing:.04em;color:var(--accent);white-space:nowrap;}
+header h1 span{color:var(--accent2);}
+.header-info{font-size:.6rem;color:var(--muted);line-height:1.7;}
+.header-actions{margin-left:auto;display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
+.btn{font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700;letter-spacing:.08em;padding:6px 12px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text);transition:all .15s;text-transform:uppercase;}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+.btn-accent{background:var(--accent);color:#000;border-color:var(--accent);}
+.btn-accent:hover{background:#ffff55;color:#000;}
+.btn-danger:hover{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.btn-spotify{background:var(--spotify);color:#000;border-color:var(--spotify);font-weight:700;}
+.btn-spotify:hover{background:#1ed760;color:#000;border-color:#1ed760;}
+.btn-spotify:disabled{background:#1a5c30;color:#333;border-color:#1a5c30;cursor:not-allowed;}
+.btn-lastfm{background:var(--lastfm);color:#fff;border-color:var(--lastfm);font-weight:700;}
+.btn-lastfm:hover{background:#ff1a0a;color:#fff;border-color:#ff1a0a;}
+.btn-lastfm:disabled{background:#6b0a05;color:#888;border-color:#6b0a05;cursor:not-allowed;}
+.layout{display:grid;grid-template-columns:280px 1fr 330px;height:calc(100vh - 61px);}
+.panel{display:flex;flex-direction:column;overflow:hidden;}
+.panel-left{border-right:2px solid var(--border);background:var(--surface);}
+.panel-center{background:var(--bg);}
+.panel-right{border-left:2px solid var(--border);background:var(--surface);}
+.panel-title{font-family:'Black Han Sans',sans-serif;font-size:.72rem;letter-spacing:.15em;color:var(--muted);padding:11px 13px 9px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;text-transform:uppercase;flex-shrink:0;}
+.panel-title .count{margin-left:auto;background:var(--accent);color:#000;font-family:'Space Mono',monospace;font-size:.58rem;padding:2px 6px;font-weight:700;}
+.filter-area{flex-shrink:0;border-bottom:1px solid var(--border);}
+.search-wrap{padding:7px 9px;border-bottom:1px solid var(--border);}
+.search-wrap input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Space Mono',monospace;font-size:.72rem;padding:5px 9px;outline:none;}
+.search-wrap input:focus{border-color:var(--accent);}
+.search-wrap input::placeholder{color:var(--muted);}
+.year-filters{padding:6px 8px;display:flex;flex-wrap:wrap;gap:4px;}
+.year-btn{font-family:'Space Mono',monospace;font-size:.56rem;padding:3px 6px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .12s;}
+.year-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(232,255,0,.07);}
+.year-btn:hover{color:var(--text);border-color:#444;}
+.band-list{flex:1;overflow-y:auto;padding:3px 0;}
+.band-list::-webkit-scrollbar{width:3px;}
+.band-list::-webkit-scrollbar-thumb{background:var(--border);}
+.band-item{padding:5px 13px;font-size:.73rem;cursor:grab;display:flex;align-items:center;gap:7px;border-left:3px solid transparent;transition:all .1s;user-select:none;}
+.band-item:hover{background:var(--surface2);border-left-color:var(--accent);}
+.band-item.dragging{opacity:.35;}
+.drag-handle{color:var(--muted);font-size:.68rem;flex-shrink:0;}
+.item-name{flex:1;}
+.item-year{font-size:.6rem;color:var(--accent);opacity:.7;font-weight:700;flex-shrink:0;}
+.item-score{font-size:.55rem;color:var(--muted);flex-shrink:0;padding:1px 4px;border:1px solid var(--border);}
+.item-score.spotify{color:var(--spotify);border-color:var(--spotify);}
+.item-score.lastfm{color:var(--lastfm);border-color:var(--lastfm);}
+.drop-zone{flex:1;overflow-y:auto;padding:5px;}
+.drop-zone::-webkit-scrollbar{width:3px;}
+.drop-zone::-webkit-scrollbar-thumb{background:var(--border);}
+.drop-zone.drag-over{background:rgba(232,255,0,.025);}
+.drop-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--muted);font-size:.73rem;pointer-events:none;text-align:center;padding:20px;}
+.drop-empty .big{font-size:2.2rem;}
+.rank-group{margin-bottom:2px;}
+.ranked-item{display:flex;align-items:center;gap:7px;padding:6px 9px;background:var(--ranked-bg);border:1px solid var(--ranked-border);border-left:3px solid var(--accent);cursor:grab;transition:background .1s;user-select:none;}
+.ranked-item:hover{background:#1c2e00;}
+.ranked-item.dragging{opacity:.3;}
+.ranked-item.drop-above{border-top:2px solid var(--accent2);}
+.ranked-item.is-tie{background:var(--tie-bg);border-color:var(--tie-border);border-left:3px solid var(--accent);margin-top:1px;padding-left:22px;}
+.ranked-item.is-tie .rank-num{color:var(--muted);font-size:.75rem;}
+.rank-num{font-family:'Black Han Sans',sans-serif;font-size:.95rem;color:var(--accent);min-width:30px;text-align:right;flex-shrink:0;}
+.rank-num.top3{color:#ffd700;font-size:1.15rem;}
+.rank-num.top10{color:#aaa;}
+.ranked-name{flex:1;font-size:.78rem;font-weight:700;}
+.ranked-year-badge{font-size:.6rem;font-weight:700;color:#000;background:var(--accent);padding:1px 5px;flex-shrink:0;}
+.tie-btn{background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:.6rem;padding:1px 5px;line-height:1.4;transition:all .12s;flex-shrink:0;font-family:'Space Mono',monospace;}
+.tie-btn:hover{border-color:var(--accent);color:var(--accent);}
+.tie-btn.active{border-color:var(--accent2);color:var(--accent2);}
+.remove-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.82rem;padding:0 2px;line-height:1;transition:color .1s;flex-shrink:0;}
+.remove-btn:hover{color:var(--accent2);}
+.loading-msg{padding:20px;text-align:center;color:var(--muted);font-size:.72rem;line-height:2;}
+.factor-ctrl{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.factor-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.factor-label{font-size:.62rem;color:var(--muted);flex:1;line-height:1.5;}
+.factor-val{font-family:'Black Han Sans',sans-serif;font-size:1rem;color:var(--accent);min-width:36px;text-align:right;}
+input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;height:3px;}
+.factor-hint{font-size:.56rem;color:var(--muted);line-height:1.6;}
+.stats-content{flex:1;overflow-y:auto;padding:8px 10px;}
+.stats-content::-webkit-scrollbar{width:3px;}
+.stats-content::-webkit-scrollbar-thumb{background:var(--border);}
+.year-stat{margin-bottom:6px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--muted);}
+.year-stat.has-data{border-left-color:var(--accent);}
+.year-stat-header{display:flex;align-items:baseline;gap:5px;margin-bottom:2px;}
+.year-label{font-family:'Black Han Sans',sans-serif;font-size:.95rem;color:var(--accent);}
+.year-stat:not(.has-data) .year-label{color:var(--muted);}
+.avg-score{font-size:.72rem;margin-left:auto;color:var(--muted);}
+.year-stat.has-data .avg-score{color:var(--accent);font-weight:700;}
+.adj-score{font-size:.65rem;color:var(--accent2);margin-left:3px;}
+.ranked-count{font-size:.58rem;color:var(--muted);}
+.bar-wrap{height:3px;background:var(--border);margin-top:4px;}
+.bar-fill{height:100%;background:var(--accent);transition:width .4s cubic-bezier(.25,.46,.45,.94);}
+.no-stats{padding:20px;text-align:center;color:var(--muted);font-size:.7rem;line-height:2;}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--accent);color:#000;font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;padding:8px 16px;z-index:9999;transition:transform .22s;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.drag-ghost{position:fixed;pointer-events:none;background:var(--accent);color:#000;font-family:'Space Mono',monospace;font-size:.72rem;font-weight:700;padding:4px 11px;z-index:9999;transform:translate(-50%,-50%) rotate(-2deg);display:none;white-space:nowrap;}
+
+/* ── AUTO-RANK MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+.modal-overlay.hidden{display:none;}
+.modal{background:var(--surface);border:2px solid var(--border);padding:0;width:520px;max-width:95vw;max-height:88vh;overflow-y:auto;position:relative;}
+.modal-header{padding:16px 20px 14px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:10px;}
+.modal-header h2{font-family:'Black Han Sans',sans-serif;font-size:1.1rem;letter-spacing:.05em;flex:1;}
+.modal-header h2.spotify-title{color:var(--spotify);}
+.modal-header h2.lastfm-title{color:var(--lastfm);}
+.modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;padding:0 4px;line-height:1;transition:color .1s;}
+.modal-close:hover{color:var(--accent2);}
+.modal-body{padding:16px 20px;}
+.modal-section{margin-bottom:14px;}
+.modal-label{font-size:.62rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
+.modal-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Space Mono',monospace;font-size:.78rem;padding:7px 10px;outline:none;transition:border-color .12s;}
+.modal-input:focus{border-color:var(--accent);}
+.modal-hint{font-size:.58rem;color:var(--muted);margin-top:4px;line-height:1.6;}
+.modal-hint a{color:var(--accent);text-decoration:none;}
+.modal-hint a:hover{text-decoration:underline;}
+.modal-actions{display:flex;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);}
+.modal-actions .btn{flex:1;text-align:center;}
+.progress-area{display:none;margin-top:12px;padding:10px;background:var(--bg);border:1px solid var(--border);}
+.progress-area.visible{display:block;}
+.progress-text{font-size:.65rem;color:var(--muted);line-height:1.8;}
+.progress-bar-outer{height:4px;background:var(--border);margin-top:6px;}
+.progress-bar-inner{height:100%;background:var(--accent);width:0%;transition:width .3s;}
+.result-area{display:none;margin-top:12px;}
+.result-area.visible{display:block;}
+.result-item{display:flex;align-items:center;gap:8px;padding:4px 8px;font-size:.68rem;border-left:2px solid var(--border);margin-bottom:2px;}
+.result-item.matched{border-left-color:var(--accent);}
+.result-item.unmatched{border-left-color:var(--muted);color:var(--muted);}
+.result-score{font-family:'Black Han Sans',sans-serif;font-size:.9rem;min-width:60px;text-align:right;}
+.result-score.spotify{color:var(--spotify);}
+.result-score.lastfm{color:var(--lastfm);}
+.result-name{flex:1;}
+.mode-toggle{display:flex;gap:0;margin-bottom:14px;}
+.mode-btn{flex:1;font-family:'Space Mono',monospace;font-size:.62rem;font-weight:700;letter-spacing:.07em;padding:7px 4px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--muted);text-transform:uppercase;transition:all .12s;text-align:center;}
+.mode-btn.active{background:var(--accent);color:#000;border-color:var(--accent);}
+.mode-btn:first-child{border-right:none;}
+.mode-btn:last-child{border-left:none;}
+.mode-btn:only-child{}
+.warning-box{background:#1a0800;border:1px solid #443000;padding:8px 10px;font-size:.62rem;color:#cc8800;line-height:1.7;margin-bottom:12px;}
+.success-box{background:#001a08;border:1px solid #005020;padding:8px 10px;font-size:.62rem;color:#00cc66;line-height:1.7;margin-bottom:12px;}
+.connected-badge{display:inline-block;background:var(--spotify);color:#000;font-size:.55rem;font-weight:700;padding:1px 5px;margin-left:6px;vertical-align:middle;}
+.connected-badge.lastfm{background:var(--lastfm);color:#fff;}
+
+/* sort indicator in left panel */
+.sort-indicator{font-size:.55rem;padding:2px 6px;border:1px solid var(--border);color:var(--muted);display:none;}
+.sort-indicator.spotify{border-color:var(--spotify);color:var(--spotify);display:inline-block;}
+.sort-indicator.lastfm{border-color:var(--lastfm);color:var(--lastfm);display:inline-block;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ROCK IM PARK <span>RANKER</span></h1>
+  <div class="header-info">
+    2008–2026 · Daten aus bands.csv · Auftritte einzeln rankbar<br>
+    Drag &amp; Drop oder Doppelklick · = verbindet mit darüber
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-spotify" onclick="openModal('spotify')" id="spotify-btn">🎵 SPOTIFY</button>
+    <button class="btn btn-lastfm" onclick="openModal('lastfm')" id="lastfm-btn">📻 LAST.FM</button>
+    <button class="btn btn-danger" onclick="clearAll()">RESET</button>
+    <button class="btn" onclick="triggerImport()">IMPORT</button>
+    <input type="file" id="import-input" accept=".txt" style="display:none" onchange="importRanking(event)">
+    <button class="btn btn-accent" onclick="exportRanking()">EXPORT</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="panel panel-left">
+    <div class="panel-title">
+      AUFTRITTE <span class="count" id="unranked-count">…</span>
+      <span class="sort-indicator" id="sort-indicator">—</span>
+    </div>
+    <div class="filter-area">
+      <div class="search-wrap">
+        <input type="text" id="search" placeholder="Band oder Jahr suchen…" oninput="renderBandList()">
+      </div>
+      <div class="year-filters" id="year-filters"></div>
+    </div>
+    <div class="band-list" id="band-list"><div class="loading-msg">Lade bands.csv…</div></div>
+  </div>
+
+  <div class="panel panel-center">
+    <div class="panel-title">RANGLISTE <span class="count" id="ranked-count">0</span></div>
+    <div class="drop-zone" id="drop-zone"
+      ondragover="onZoneDragOver(event)" ondrop="onZoneDrop(event)" ondragleave="onZoneDragLeave(event)">
+      <div class="drop-empty" id="drop-empty">
+        <span class="big">🎸</span>
+        Auftritte von links hierher ziehen<br>
+        <span style="font-size:.65rem;margin-top:6px;display:block">= verbindet mit dem Eintrag darüber</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-right">
+    <div class="panel-title">JAHRES-STATISTIK</div>
+    <div class="factor-ctrl">
+      <div class="factor-row">
+        <span class="factor-label">Anzahl-Faktor<br><span style="font-size:.55rem">(±Abw. vom Ø × Faktor auf Rang)</span></span>
+        <span class="factor-val" id="factor-display">0.00</span>
+      </div>
+      <input type="range" id="factor-slider" min="0" max="2" step="0.05" value="0" oninput="onFactorChange()">
+      <div class="factor-hint" id="factor-hint">Faktor 0 = kein Einfluss der Bandanzahl</div>
+    </div>
+    <div class="stats-content" id="stats-content">
+      <div class="no-stats">Noch nichts gerankt.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SPOTIFY MODAL ── -->
+<div class="modal-overlay hidden" id="modal-spotify">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="spotify-title">🎵 AUTO-RANK: SPOTIFY</h2>
+      <button class="modal-close" onclick="closeModal('spotify')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="warning-box" style="margin-bottom:12px;">
+        ℹ️ Redirect URI in deiner Spotify App eintragen:<br>
+        <code id="spotify-redirect-display" style="color:var(--accent);font-size:.65rem;word-break:break-all;"></code>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label">Ranking-Modus</div>
+        <div class="mode-toggle">
+          <div class="mode-btn active" id="sp-mode-liked" onclick="setSpMode('liked')">♥ LIKED SONGS</div>
+          <div class="mode-btn" id="sp-mode-top" onclick="setSpMode('top')">📈 TOP ARTISTS</div>
+        </div>
+        <div class="modal-hint" id="sp-mode-hint">Alle Bands, für die du Songs in "Liked Songs" gespeichert hast, werden höher gerankt.</div>
+      </div>
+
+      <div id="spotify-auth-section">
+        <div class="modal-actions">
+          <button class="btn btn-spotify" onclick="startSpotifyAuth()" id="spotify-auth-btn">MIT SPOTIFY VERBINDEN</button>
+          <button class="btn" onclick="closeModal('spotify')">ABBRECHEN</button>
+        </div>
+      </div>
+
+      <div id="spotify-connected-section" style="display:none;">
+        <div class="success-box">
+          ✅ Verbunden als: <strong id="spotify-user-display"></strong>
+          <br><button style="background:none;border:none;color:#cc4400;cursor:pointer;font-size:.6rem;font-family:'Space Mono',monospace;margin-top:4px;" onclick="disconnectSpotify()">Verbindung trennen</button>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-spotify" onclick="runSpotifyRanking()" id="spotify-run-btn">AUTO-RANKING STARTEN</button>
+          <button class="btn" onclick="closeModal('spotify')">SCHLIESSEN</button>
+        </div>
+      </div>
+
+      <div class="progress-area" id="spotify-progress">
+        <div class="progress-text" id="spotify-progress-text">Verbinde mit Spotify…</div>
+        <div class="progress-bar-outer"><div class="progress-bar-inner" id="spotify-progress-bar"></div></div>
+      </div>
+
+      <div class="result-area" id="spotify-results"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── LAST.FM MODAL ── -->
+<div class="modal-overlay hidden" id="modal-lastfm">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="lastfm-title">📻 AUTO-RANK: LAST.FM</h2>
+      <button class="modal-close" onclick="closeModal('lastfm')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="modal-section">
+        <div class="modal-label">Last.fm Username</div>
+        <input class="modal-input" id="lastfm-username" placeholder="dein-username">
+        <div class="modal-hint">Dein öffentliches Last.fm Profil (Scrobbles müssen sichtbar sein).</div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label">Zeitraum</div>
+        <div class="mode-toggle">
+          <div class="mode-btn active" id="lfm-period-overall" onclick="setLfmPeriod('overall')">GESAMT</div>
+          <div class="mode-btn" id="lfm-period-12month" onclick="setLfmPeriod('12month')">12 MONATE</div>
+          <div class="mode-btn" id="lfm-period-6month" onclick="setLfmPeriod('6month')">6 MONATE</div>
+          <div class="mode-btn" id="lfm-period-3month" onclick="setLfmPeriod('3month')">3 MONATE</div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label">Ranking-Basis</div>
+        <div class="mode-toggle">
+          <div class="mode-btn active" id="lfm-mode-scrobbles" onclick="setLfmMode('scrobbles')">SCROBBLES</div>
+          <div class="mode-btn" id="lfm-mode-rank" onclick="setLfmMode('rank')">CHART-RANG</div>
+        </div>
+        <div class="modal-hint" id="lfm-mode-hint">Je mehr Scrobbles, desto weiter oben im Ranking.</div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-lastfm" onclick="runLastfmRanking()" id="lastfm-run-btn">AUTO-RANKING STARTEN</button>
+        <button class="btn" onclick="closeModal('lastfm')">ABBRECHEN</button>
+      </div>
+
+      <div class="progress-area" id="lastfm-progress">
+        <div class="progress-text" id="lastfm-progress-text">Lade Daten von Last.fm…</div>
+        <div class="progress-bar-outer"><div class="progress-bar-inner" id="lastfm-progress-bar"></div></div>
+      </div>
+
+      <div class="result-area" id="lastfm-results"></div>
+    </div>
+  </div>
+</div>
+
+<div class="drag-ghost" id="drag-ghost"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// CSV LOADER
+// ═══════════════════════════════════════════════════
+
+let ALL_SLOTS = [];
+let ALL_IDS = [];
+let slotById = {};
+let YEARS = [];
+let dataReady = false;
+
+async function loadCSV() {
+  try {
+    const resp = await fetch('bands.csv');
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const text = await resp.text();
+    parseCSV(text);
+  } catch(e) {
+    document.getElementById('band-list').innerHTML =
+      `<div class="loading-msg" style="color:var(--accent2)">Fehler: bands.csv nicht gefunden.<br>${e.message}</div>`;
+  }
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const m = line.match(/^(\d{4}),(.+)$/);
+    if (!m) continue;
+    const year = parseInt(m[1]);
+    const band = m[2].replace(/^"|"$/g, '').trim();
+    if (!band) continue;
+    ALL_SLOTS.push({ id: `${band}__${year}`, band, year });
+  }
+  ALL_SLOTS.sort((a, b) => a.band.localeCompare(b.band) || a.year - b.year);
+  ALL_IDS = ALL_SLOTS.map(s => s.id);
+  for (const s of ALL_SLOTS) slotById[s.id] = s;
+  YEARS = [...new Set(ALL_SLOTS.map(s => s.year))].sort((a,b) => a-b);
+  dataReady = true;
+  initApp();
+}
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+
+let ranked = [];
+let unranked = [];
+let activeYearFilter = null;
+let factor = 0;
+let dragSrc = null, dragSrcType = null;
+
+// Auto-rank scores: { bandName_lower: score }
+let autoRankScores = {};
+let autoRankSource = null; // 'spotify' | 'lastfm' | null
+
+function flatRanked() { return ranked.flatMap(r => Array.isArray(r) ? r : [r]); }
+function rankedIdsSet(){ return new Set(flatRanked()); }
+function rankAt(i) { return i + 1; }
+function rankOf(id) {
+  for (let i = 0; i < ranked.length; i++) {
+    const r = ranked[i];
+    if (Array.isArray(r) ? r.includes(id) : r === id) return rankAt(i);
+  }
+  return null;
+}
+
+function initApp() {
+  const saved = localStorage.getItem('rip3_ranking');
+  if (saved) {
+    try {
+      const p = JSON.parse(saved);
+      ranked = (p.ranked || []).map(r => {
+        if (Array.isArray(r)) return r.filter(id => ALL_IDS.includes(id));
+        return ALL_IDS.includes(r) ? r : null;
+      }).filter(r => r !== null && (!Array.isArray(r) || r.length > 0));
+      factor = p.factor || 0;
+    } catch(e) { ranked = []; factor = 0; }
+  }
+  unranked = ALL_IDS.filter(id => !rankedIdsSet().has(id));
+  document.getElementById('factor-slider').value = factor;
+  document.getElementById('factor-display').textContent = factor.toFixed(2);
+
+  // restore lastfm username
+  const savedLfmUser = localStorage.getItem('rip3_lastfm_username');
+  if (savedLfmUser) document.getElementById('lastfm-username').value = savedLfmUser;
+
+  // check spotify token from URL hash (OAuth callback)
+  checkSpotifyCallback();
+
+  // check for saved spotify token
+  const savedToken = sessionStorage.getItem('rip3_spotify_token');
+  if (savedToken) {
+    spotifyAccessToken = savedToken;
+    const savedUser = sessionStorage.getItem('rip3_spotify_user');
+    if (savedUser) {
+      spotifyUserName = savedUser;
+      updateSpotifyConnectedUI();
+    }
+  }
+
+  buildYearFilters();
+  renderBandList();
+  renderRanked();
+  renderStats();
+  updateRedirectDisplay();
+}
+
+function save() {
+  try { localStorage.setItem('rip3_ranking', JSON.stringify({ ranked, factor })); } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════
+// YEAR FILTERS
+// ═══════════════════════════════════════════════════
+
+function buildYearFilters() {
+  const wrap = document.getElementById('year-filters');
+  wrap.innerHTML = '';
+  const mk = (lbl, yr) => {
+    const b = document.createElement('button');
+    b.className = 'year-btn' + (activeYearFilter === yr ? ' active' : '');
+    b.textContent = lbl;
+    b.onclick = () => { activeYearFilter = activeYearFilter === yr ? null : yr; buildYearFilters(); renderBandList(); };
+    wrap.appendChild(b);
+  };
+  mk('Alle', null);
+  YEARS.forEach(yr => mk(yr, yr));
+}
+
+// ═══════════════════════════════════════════════════
+// LEFT PANEL
+// ═══════════════════════════════════════════════════
+
+function getSlotScore(id) {
+  if (!autoRankSource || !Object.keys(autoRankScores).length) return null;
+  const s = slotById[id];
+  const key = s.band.toLowerCase();
+  return autoRankScores[key] ?? null;
+}
+
+function renderBandList() {
+  if (!dataReady) return;
+  const list = document.getElementById('band-list');
+  const q = document.getElementById('search').value.trim().toLowerCase();
+
+  // sort unranked: if autoRankScores active, sort by score desc
+  let items = [...unranked];
+  if (autoRankSource) {
+    items.sort((a, b) => {
+      const sa = getSlotScore(a) ?? -1;
+      const sb = getSlotScore(b) ?? -1;
+      if (sb !== sa) return sb - sa;
+      return slotById[a].band.localeCompare(slotById[b].band);
+    });
+    const ind = document.getElementById('sort-indicator');
+    ind.className = 'sort-indicator ' + autoRankSource;
+    ind.textContent = autoRankSource === 'spotify' ? '♥ SPOTIFY' : '📻 LAST.FM';
+  } else {
+    document.getElementById('sort-indicator').className = 'sort-indicator';
+  }
+
+  list.innerHTML = '';
+  for (const id of items) {
+    const s = slotById[id];
+    if (activeYearFilter !== null && s.year !== activeYearFilter) continue;
+    if (q && !s.band.toLowerCase().includes(q) && !String(s.year).includes(q)) continue;
+
+    const score = getSlotScore(id);
+    const el = document.createElement('div');
+    el.className = 'band-item';
+    el.draggable = true;
+    el.dataset.id = id;
+
+    let scoreHtml = '';
+    if (score !== null) {
+      const cls = autoRankSource;
+      const label = autoRankSource === 'spotify'
+        ? (score > 0 ? `♥${score}` : '—')
+        : (score > 0 ? `${score.toLocaleString()}×` : '—');
+      scoreHtml = `<span class="item-score ${cls}">${label}</span>`;
+    }
+
+    el.innerHTML = `<span class="drag-handle">⠿</span><span class="item-name">${s.band}</span><span class="item-year">${s.year}</span>${scoreHtml}`;
+    el.addEventListener('dragstart', e => onUnrankedDragStart(e, id));
+    el.addEventListener('dragend', onDragEnd);
+    el.addEventListener('dblclick', () => addSlot(id));
+    list.appendChild(el);
+  }
+  document.getElementById('unranked-count').textContent = unranked.length;
+}
+
+// ═══════════════════════════════════════════════════
+// CENTER PANEL
+// ═══════════════════════════════════════════════════
+
+function renderRanked() {
+  const zone = document.getElementById('drop-zone');
+  document.getElementById('drop-empty').style.display = ranked.length === 0 ? 'flex' : 'none';
+  zone.querySelectorAll('.rank-group').forEach(el => el.remove());
+
+  let totalSlots = 0;
+  ranked.forEach((r, posIdx) => {
+    const ids = Array.isArray(r) ? r : [r];
+    const rank = rankAt(posIdx);
+    const group = document.createElement('div');
+    group.className = 'rank-group';
+    group.dataset.pos = posIdx;
+
+    ids.forEach((id, tieIdx) => {
+      const s = slotById[id];
+      const isTie = tieIdx > 0;
+      const el = document.createElement('div');
+      el.className = 'ranked-item' + (isTie ? ' is-tie' : '');
+      el.draggable = true;
+      el.dataset.id = id;
+      el.dataset.pos = posIdx;
+
+      const rankClass = rank <= 3 ? 'top3' : rank <= 10 ? 'top10' : '';
+      const lbl = isTie ? '=' : rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+
+      let tieBtn = '';
+      if (isTie) {
+        tieBtn = `<button class="tie-btn active" title="Gleichstand aufheben" data-action="untie" data-id="${id}" data-pos="${posIdx}">≠</button>`;
+      } else if (posIdx > 0) {
+        tieBtn = `<button class="tie-btn" title="Mit darüber gleichstellen" data-action="tie" data-pos="${posIdx}">= ↑</button>`;
+      }
+
+      el.innerHTML = `
+        <span class="rank-num ${rankClass}">${lbl}</span>
+        <span class="ranked-name">${s.band}</span>
+        <span class="ranked-year-badge">${s.year}</span>
+        ${tieBtn}
+        <button class="remove-btn" data-id="${id}">✕</button>
+      `;
+
+      el.querySelector('.remove-btn').addEventListener('click', () => removeSlot(id));
+      if (tieBtn) {
+        const tb = el.querySelector('.tie-btn');
+        tb.addEventListener('click', e => {
+          e.stopPropagation();
+          if (tb.dataset.action === 'tie') tiePosition(posIdx);
+          else untieSlot(id, posIdx);
+        });
+      }
+
+      el.addEventListener('dragstart', e => onRankedDragStart(e, id, posIdx));
+      el.addEventListener('dragend', onDragEnd);
+      el.addEventListener('dragover', e => onRankedItemDragOver(e, el, posIdx));
+      el.addEventListener('drop', e => onRankedItemDrop(e, posIdx));
+      group.appendChild(el);
+      totalSlots++;
+    });
+    zone.appendChild(group);
+  });
+  document.getElementById('ranked-count').textContent = totalSlots;
+}
+
+// ═══════════════════════════════════════════════════
+// TIE OPS
+// ═══════════════════════════════════════════════════
+
+function tiePosition(posIdx) {
+  if (posIdx <= 0) return;
+  const above = ranked[posIdx - 1];
+  const curr = ranked[posIdx];
+  const aboveArr = Array.isArray(above) ? above : [above];
+  const currArr = Array.isArray(curr) ? curr : [curr];
+  ranked.splice(posIdx - 1, 2, [...aboveArr, ...currArr]);
+  save(); renderRanked(); renderStats();
+}
+
+function untieSlot(id, posIdx) {
+  const r = ranked[posIdx];
+  if (!Array.isArray(r)) return;
+  const newGroup = r.filter(x => x !== id);
+  ranked.splice(posIdx, 1, ...(newGroup.length > 1 ? [newGroup] : [newGroup[0]]), id);
+  save(); renderRanked(); renderStats();
+}
+
+// ═══════════════════════════════════════════════════
+// SLOT OPS
+// ═══════════════════════════════════════════════════
+
+function addSlot(id, atPos = null) {
+  if (rankedIdsSet().has(id)) return;
+  unranked = unranked.filter(x => x !== id);
+  atPos !== null ? ranked.splice(atPos, 0, id) : ranked.push(id);
+  save(); renderBandList(); renderRanked(); renderStats();
+  if (atPos === null) { const z = document.getElementById('drop-zone'); z.scrollTop = z.scrollHeight; }
+}
+
+function removeSlot(id) {
+  const posIdx = ranked.findIndex(r => Array.isArray(r) ? r.includes(id) : r === id);
+  if (posIdx === -1) return;
+  const r = ranked[posIdx];
+  if (Array.isArray(r)) {
+    const newG = r.filter(x => x !== id);
+    if (newG.length === 1) ranked.splice(posIdx, 1, newG[0]);
+    else if (newG.length > 1) ranked.splice(posIdx, 1, newG);
+    else ranked.splice(posIdx, 1);
+  } else ranked.splice(posIdx, 1);
+  unranked = ALL_IDS.filter(x => !rankedIdsSet().has(x));
+  save(); renderBandList(); renderRanked(); renderStats();
+}
+
+function removeFromRankedOnly(id) {
+  const posIdx = ranked.findIndex(r => Array.isArray(r) ? r.includes(id) : r === id);
+  if (posIdx === -1) return;
+  const r = ranked[posIdx];
+  if (Array.isArray(r)) {
+    const newG = r.filter(x => x !== id);
+    if (newG.length === 1) ranked.splice(posIdx, 1, newG[0]);
+    else if (newG.length > 1) ranked.splice(posIdx, 1, newG);
+    else ranked.splice(posIdx, 1);
+  } else ranked.splice(posIdx, 1);
+}
+
+function clearAll() {
+  if (!confirm('Gesamtes Ranking zurücksetzen?')) return;
+  ranked = []; unranked = [...ALL_IDS];
+  save(); renderBandList(); renderRanked(); renderStats();
+  showToast('Ranking zurückgesetzt');
+}
+
+// ═══════════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════════
+
+function onFactorChange() {
+  factor = parseFloat(document.getElementById('factor-slider').value);
+  document.getElementById('factor-display').textContent = factor.toFixed(2);
+  save(); renderStats();
+}
+
+function computeStats() {
+  const yearData = YEARS.map(yr => {
+    const sl = flatRanked().filter(id => slotById[id].year === yr);
+    if (!sl.length) return { yr, avg: null, adjAvg: null, count: 0 };
+    const avg = sl.reduce((s, id) => s + rankOf(id), 0) / sl.length;
+    return { yr, avg, adjAvg: null, count: sl.length };
+  });
+  const withData = yearData.filter(d => d.avg !== null);
+  if (!withData.length) return yearData;
+  const avgCount = withData.reduce((s, d) => s + d.count, 0) / withData.length;
+  withData.forEach(d => { d.adjAvg = d.avg - (d.count - avgCount) * factor; });
+  return yearData;
+}
+
+function renderStats() {
+  const content = document.getElementById('stats-content');
+  if (!flatRanked().length) {
+    content.innerHTML = '<div class="no-stats">Noch nichts gerankt.</div>';
+    document.getElementById('factor-hint').textContent = 'Faktor 0 = kein Einfluss der Bandanzahl';
+    return;
+  }
+  const yearData = computeStats();
+  const withData = yearData.filter(d => d.avg !== null);
+  const noData = yearData.filter(d => d.avg === null);
+  const avgCount = withData.length ? withData.reduce((s, d) => s + d.count, 0) / withData.length : 0;
+  document.getElementById('factor-hint').textContent =
+    `Ø ${avgCount.toFixed(1)} Auftritte/Jahr · Faktor: ${factor.toFixed(2)}`;
+  const sorted = [...withData].sort((a, b) => (a.adjAvg ?? a.avg) - (b.adjAvg ?? b.avg));
+  const maxScore = Math.max(...sorted.map(d => d.adjAvg ?? d.avg), 1);
+  content.innerHTML = '';
+  if (sorted.length) {
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'font-size:.58rem;color:var(--muted);padding:3px 2px 6px;letter-spacing:.1em;';
+    hdr.textContent = '↑ BESTES JAHR ZUERST' + (factor > 0 ? ' (FAKTOR AKTIV)' : '');
+    content.appendChild(hdr);
+    sorted.forEach(d => content.appendChild(buildStatEl(d, maxScore, avgCount)));
+  }
+  if (noData.length) {
+    const sep = document.createElement('div');
+    sep.style.cssText = 'font-size:.58rem;color:var(--muted);padding:7px 2px 3px;letter-spacing:.1em;';
+    sep.textContent = 'KEINE GERANKTEN AUFTRITTE:';
+    content.appendChild(sep);
+    noData.forEach(d => content.appendChild(buildStatEl(d, maxScore, avgCount)));
+  }
+}
+
+function buildStatEl(d, maxScore, avgCount) {
+  const el = document.createElement('div');
+  el.className = 'year-stat' + (d.avg !== null ? ' has-data' : '');
+  if (d.avg !== null) {
+    const score = d.adjAvg ?? d.avg;
+    const barPct = Math.max(4, 100 - (score / maxScore) * 80);
+    const deviation = d.count - avgCount;
+    let adjHtml = '';
+    if (factor > 0 && Math.abs(deviation) > 0.01) {
+      adjHtml = `<span class="adj-score">${deviation > 0 ? '▲' : '▼'}${Math.abs(deviation * factor).toFixed(1)}</span>`;
+    }
+    el.innerHTML = `
+      <div class="year-stat-header">
+        <span class="year-label">${d.yr}</span>
+        <span class="ranked-count">${d.count}×</span>
+        <span class="avg-score">Ø ${score.toFixed(1)}${adjHtml}</span>
+      </div>
+      <div class="bar-wrap"><div class="bar-fill" style="width:${barPct}%"></div></div>`;
+    el.title = `Roh-Ø: ${d.avg.toFixed(2)} · ${d.count} Auftritte (Ø ${avgCount.toFixed(1)}) · Korr: ${((d.adjAvg ?? d.avg) - d.avg).toFixed(2)}`;
+  } else {
+    el.innerHTML = `<div class="year-stat-header"><span class="year-label">${d.yr}</span><span class="ranked-count">—</span></div>`;
+  }
+  return el;
+}
+
+// ═══════════════════════════════════════════════════
+// DRAG & DROP
+// ═══════════════════════════════════════════════════
+
+function onUnrankedDragStart(e, id) {
+  dragSrc = id; dragSrcType = 'unranked';
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', id);
+  setTimeout(() => { const el = document.querySelector(`.band-item[data-id="${CSS.escape(id)}"]`); if (el) el.classList.add('dragging'); }, 0);
+  showGhost(`${slotById[id].band} · ${slotById[id].year}`, e);
+}
+
+function onRankedDragStart(e, id) {
+  dragSrc = id; dragSrcType = 'ranked';
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', id);
+  setTimeout(() => { const el = document.querySelector(`.ranked-item[data-id="${CSS.escape(id)}"]`); if (el) el.classList.add('dragging'); }, 0);
+  showGhost(`${slotById[id].band} · ${slotById[id].year}`, e);
+}
+
+function onDragEnd() {
+  dragSrc = null; dragSrcType = null;
+  document.querySelectorAll('.dragging,.drop-above').forEach(el => el.classList.remove('dragging', 'drop-above'));
+  hideGhost();
+}
+
+function onZoneDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; document.getElementById('drop-zone').classList.add('drag-over'); }
+function onZoneDragLeave(e) { document.getElementById('drop-zone').classList.remove('drag-over'); }
+
+function onZoneDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag-over');
+  const id = e.dataTransfer.getData('text/plain');
+  if (!id || !slotById[id]) return;
+  if (dragSrcType === 'unranked') { addSlot(id); }
+  else if (dragSrcType === 'ranked') { removeFromRankedOnly(id); ranked.push(id); unranked = ALL_IDS.filter(x => !rankedIdsSet().has(x)); save(); renderBandList(); renderRanked(); renderStats(); }
+}
+
+function onRankedItemDragOver(e, el, posIdx) {
+  e.preventDefault(); e.stopPropagation();
+  if (dragSrc && dragSrc !== el.dataset.id) {
+    document.querySelectorAll('.drop-above').forEach(x => x.classList.remove('drop-above'));
+    const group = document.querySelector(`.rank-group[data-pos="${posIdx}"]`);
+    if (group) { const first = group.querySelector('.ranked-item'); if (first) first.classList.add('drop-above'); }
+  }
+}
+
+function onRankedItemDrop(e, targetPos) {
+  e.preventDefault(); e.stopPropagation();
+  const id = e.dataTransfer.getData('text/plain');
+  if (!id || !slotById[id]) return;
+  document.getElementById('drop-zone').classList.remove('drag-over');
+  document.querySelectorAll('.drop-above').forEach(el => el.classList.remove('drop-above'));
+  if (dragSrcType === 'unranked') {
+    unranked = unranked.filter(x => x !== id);
+    ranked.splice(targetPos, 0, id);
+  } else if (dragSrcType === 'ranked') {
+    const srcPos = ranked.findIndex(r => Array.isArray(r) ? r.includes(id) : r === id);
+    if (srcPos === -1 || srcPos === targetPos) return;
+    removeFromRankedOnly(id);
+    ranked.splice(srcPos < targetPos ? targetPos - 1 : targetPos, 0, id);
+  }
+  save(); renderBandList(); renderRanked(); renderStats();
+}
+
+// ═══════════════════════════════════════════════════
+// GHOST
+// ═══════════════════════════════════════════════════
+
+function showGhost(text, e) {
+  const g = document.getElementById('drag-ghost');
+  g.textContent = text; g.style.display = 'block'; moveGhost(e);
+  document.addEventListener('dragover', moveGhost);
+}
+function moveGhost(e) { const g = document.getElementById('drag-ghost'); g.style.left = e.clientX+'px'; g.style.top = e.clientY+'px'; }
+function hideGhost() { document.removeEventListener('dragover', moveGhost); document.getElementById('drag-ghost').style.display = 'none'; }
+
+// ═══════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ═══════════════════════════════════════════════════
+
+function exportRanking() {
+  if (!ranked.length) { showToast('Noch nichts zu exportieren!'); return; }
+  const lines = ['# Rock im Park Rangliste', ''];
+  let pos = 0;
+  for (const r of ranked) {
+    pos++;
+    const ids = Array.isArray(r) ? r : [r];
+    ids.forEach((id, i) => { const s = slotById[id]; lines.push(`${i === 0 ? pos : '='} ${s.band} — ${s.year}`); });
+  }
+  const stats = computeStats();
+  lines.push('', '# Jahres-Ø (niedrig = besser):');
+  stats.filter(d => d.avg !== null).sort((a, b) => (a.adjAvg ?? a.avg) - (b.adjAvg ?? b.avg))
+    .forEach(d => lines.push(`${d.yr}: Ø ${(d.adjAvg ?? d.avg).toFixed(2)} (${d.count} Auftritte, Faktor ${factor.toFixed(2)})`));
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' })),
+    download: 'rip-rangliste.txt'
+  });
+  a.click(); URL.revokeObjectURL(a.href);
+  showToast('Export gespeichert!');
+}
+
+function triggerImport() { document.getElementById('import-input').value = ''; document.getElementById('import-input').click(); }
+
+function importRanking(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const newRanked = [];
+    let currentGroup = null;
+    for (const line of ev.target.result.split('\n')) {
+      const rm = line.match(/^(\d+)\s+(.+?)\s+[—\-–]\s+(\d{4})/);
+      const tm = line.match(/^=\s+(.+?)\s+[—\-–]\s+(\d{4})/);
+      if (rm) {
+        if (currentGroup) newRanked.push(currentGroup.length === 1 ? currentGroup[0] : currentGroup);
+        const id = `${rm[2].trim()}__${parseInt(rm[3])}`;
+        currentGroup = slotById[id] ? [id] : [];
+      } else if (tm && currentGroup) {
+        const id = `${tm[1].trim()}__${parseInt(tm[2])}`;
+        if (slotById[id]) currentGroup.push(id);
+      }
+    }
+    if (currentGroup) newRanked.push(currentGroup.length === 1 ? currentGroup[0] : currentGroup);
+    const total = newRanked.flatMap(r => Array.isArray(r) ? r : [r]).length;
+    if (!total) { showToast('Keine Einträge erkannt!'); return; }
+    if (ranked.length && !confirm(`Ranking (${flatRanked().length}) ersetzen durch Import (${total})?`)) return;
+    ranked = newRanked;
+    unranked = ALL_IDS.filter(x => !rankedIdsSet().has(x));
+    save(); renderBandList(); renderRanked(); renderStats();
+    showToast(`${total} Auftritte importiert ✓`);
+  };
+  reader.readAsText(file);
+}
+
+// ═══════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ═══════════════════════════════════════════════════
+// MODAL HELPERS
+// ═══════════════════════════════════════════════════
+
+function openModal(which) {
+  document.getElementById(`modal-${which}`).classList.remove('hidden');
+  if (which === 'spotify') updateRedirectDisplay();
+}
+
+function closeModal(which) {
+  document.getElementById(`modal-${which}`).classList.add('hidden');
+}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) {
+      overlay.classList.add('hidden');
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════════
+// AUTO-RANK APPLY
+// ═══════════════════════════════════════════════════
+
+// Apply scores: sort all unranked slots by score, add to ranking
+function applyAutoRanking(scores, source, matchedBands) {
+  autoRankScores = scores;
+  autoRankSource = source;
+
+  // Get unique band names from slots, sorted by their score desc
+  const bandScores = {};
+  for (const id of ALL_IDS) {
+    const s = slotById[id];
+    const key = s.band.toLowerCase();
+    if (scores[key] !== undefined) bandScores[key] = scores[key];
+  }
+
+  // Build new ranking: matched slots first (sorted by score desc), then unmatched
+  const matchedIds = [];
+  const unmatchedIds = [];
+
+  for (const id of ALL_IDS) {
+    const s = slotById[id];
+    const key = s.band.toLowerCase();
+    if (scores[key] && scores[key] > 0) matchedIds.push(id);
+    else unmatchedIds.push(id);
+  }
+
+  // Sort matched by score desc, then band name
+  matchedIds.sort((a, b) => {
+    const ka = slotById[a].band.toLowerCase();
+    const kb = slotById[b].band.toLowerCase();
+    const sa = scores[ka] ?? 0;
+    const sb = scores[kb] ?? 0;
+    if (sb !== sa) return sb - sa;
+    return slotById[a].band.localeCompare(slotById[b].band);
+  });
+
+  // Group same-score items as ties? No — let user decide. Just place them in order.
+  ranked = matchedIds;
+  unranked = unmatchedIds;
+
+  save();
+  renderBandList();
+  renderRanked();
+  renderStats();
+
+  showToast(`${matchedIds.length} Bands durch ${source === 'spotify' ? 'Spotify' : 'Last.fm'} gerankt!`);
+}
+
+// ═══════════════════════════════════════════════════
+// SPOTIFY INTEGRATION
+// ═══════════════════════════════════════════════════
+
+let spotifyAccessToken = null;
+let spotifyUserName = null;
+let spMode = 'liked'; // 'liked' | 'top'
+
+const SPOTIFY_SCOPES = 'user-library-read user-top-read';
+
+function updateRedirectDisplay() {
+  const el = document.getElementById('spotify-redirect-display');
+  if (el) el.textContent = window.location.href.split('?')[0].split('#')[0];
+}
+
+function saveSpotifyClientId() {
+  // input removed, key is hardcoded
+}
+
+function setSpMode(mode) {
+  spMode = mode;
+  document.getElementById('sp-mode-liked').classList.toggle('active', mode === 'liked');
+  document.getElementById('sp-mode-top').classList.toggle('active', mode === 'top');
+  document.getElementById('sp-mode-hint').textContent = mode === 'liked'
+    ? 'Alle Bands, für die du Songs in "Liked Songs" gespeichert hast, werden höher gerankt.'
+    : 'Deine meistgehörten Künstler laut Spotify werden höher gerankt.';
+}
+
+function generateCodeVerifier() {
+  const arr = new Uint8Array(64);
+  crypto.getRandomValues(arr);
+  return btoa(String.fromCharCode(...arr)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+async function generateCodeChallenge(verifier) {
+  const data = new TextEncoder().encode(verifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return btoa(String.fromCharCode(...new Uint8Array(digest))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+async function startSpotifyAuth() {
+  const clientId = localStorage.getItem('rip3_spotify_client_id') || '06e275b426314005a98cda7bd7a71d88';
+  if (!clientId) { showToast('Bitte Client ID eingeben!'); return; }
+
+  const verifier = generateCodeVerifier();
+  const challenge = await generateCodeChallenge(verifier);
+  sessionStorage.setItem('rip3_spotify_verifier', verifier);
+  sessionStorage.setItem('rip3_spotify_client_id_temp', clientId);
+
+  const redirectUri = window.location.href.split('?')[0].split('#')[0];
+  const params = new URLSearchParams({
+    client_id: clientId,
+    response_type: 'code',
+    redirect_uri: redirectUri,
+    scope: SPOTIFY_SCOPES,
+    code_challenge_method: 'S256',
+    code_challenge: challenge,
+    state: 'rip_ranker_auth'
+  });
+  window.location.href = `https://accounts.spotify.com/authorize?${params}`;
+}
+
+async function checkSpotifyCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  const state = params.get('state');
+  const error = params.get('error');
+
+  if (error) {
+    showToast('Spotify Auth fehlgeschlagen: ' + error);
+    window.history.replaceState({}, document.title, window.location.pathname);
+    return;
+  }
+
+  if (!code || state !== 'rip_ranker_auth') return;
+
+  // Clean URL
+  window.history.replaceState({}, document.title, window.location.pathname);
+
+  const verifier = sessionStorage.getItem('rip3_spotify_verifier');
+  const clientId = sessionStorage.getItem('rip3_spotify_client_id_temp')
+    || localStorage.getItem('rip3_spotify_client_id');
+  const redirectUri = window.location.href.split('?')[0].split('#')[0];
+
+  if (!verifier || !clientId) { showToast('Auth-Session abgelaufen. Bitte erneut verbinden.'); return; }
+
+  try {
+    const resp = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: clientId,
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: redirectUri,
+        code_verifier: verifier
+      })
+    });
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error_description || data.error);
+
+    spotifyAccessToken = data.access_token;
+    sessionStorage.setItem('rip3_spotify_token', spotifyAccessToken);
+    sessionStorage.removeItem('rip3_spotify_verifier');
+    sessionStorage.removeItem('rip3_spotify_client_id_temp');
+
+    // Get user profile
+    const profileResp = await fetch('https://api.spotify.com/v1/me', {
+      headers: { Authorization: `Bearer ${spotifyAccessToken}` }
+    });
+    const profile = await profileResp.json();
+    spotifyUserName = profile.display_name || profile.id;
+    sessionStorage.setItem('rip3_spotify_user', spotifyUserName);
+
+    updateSpotifyConnectedUI();
+    openModal('spotify');
+    showToast(`Verbunden als ${spotifyUserName}!`);
+  } catch(e) {
+    showToast('Token-Fehler: ' + e.message);
+  }
+}
+
+function updateSpotifyConnectedUI() {
+  document.getElementById('spotify-auth-section').style.display = 'none';
+  document.getElementById('spotify-connected-section').style.display = 'block';
+  document.getElementById('spotify-user-display').textContent = spotifyUserName;
+}
+
+function disconnectSpotify() {
+  spotifyAccessToken = null;
+  spotifyUserName = null;
+  sessionStorage.removeItem('rip3_spotify_token');
+  sessionStorage.removeItem('rip3_spotify_user');
+  document.getElementById('spotify-auth-section').style.display = 'block';
+  document.getElementById('spotify-connected-section').style.display = 'none';
+}
+
+async function runSpotifyRanking() {
+  if (!spotifyAccessToken) { showToast('Bitte zuerst verbinden!'); return; }
+
+  const progressEl = document.getElementById('spotify-progress');
+  const progressText = document.getElementById('spotify-progress-text');
+  const progressBar = document.getElementById('spotify-progress-bar');
+  const resultsEl = document.getElementById('spotify-results');
+
+  progressEl.classList.add('visible');
+  resultsEl.classList.remove('visible');
+  resultsEl.innerHTML = '';
+  document.getElementById('spotify-run-btn').disabled = true;
+
+  const scores = {};
+  const allBandNames = [...new Set(ALL_SLOTS.map(s => s.band.toLowerCase()))];
+
+  try {
+    if (spMode === 'liked') {
+      // Fetch liked songs in batches of 50
+      let offset = 0;
+      let total = 1;
+      let fetched = 0;
+      progressText.textContent = 'Lade Liked Songs…';
+
+      while (offset < total) {
+        const resp = await fetch(`https://api.spotify.com/v1/me/tracks?limit=50&offset=${offset}`, {
+          headers: { Authorization: `Bearer ${spotifyAccessToken}` }
+        });
+        if (!resp.ok) {
+          if (resp.status === 401) { disconnectSpotify(); showToast('Session abgelaufen – bitte neu verbinden.'); return; }
+          throw new Error(`HTTP ${resp.status}`);
+        }
+        const data = await resp.json();
+        total = data.total;
+
+        for (const item of data.items) {
+          if (!item.track) continue;
+          for (const artist of item.track.artists) {
+            const key = artist.name.toLowerCase();
+            scores[key] = (scores[key] || 0) + 1;
+          }
+        }
+
+        fetched += data.items.length;
+        offset += 50;
+        progressBar.style.width = `${Math.min(100, (fetched / Math.max(total, 1)) * 100)}%`;
+        progressText.textContent = `Liked Songs: ${fetched} / ${total}`;
+        await new Promise(r => setTimeout(r, 80));
+      }
+
+    } else {
+      // Top artists (short, medium, long term)
+      const terms = [
+        { term: 'long_term', weight: 1 },
+        { term: 'medium_term', weight: 2 },
+        { term: 'short_term', weight: 3 }
+      ];
+      for (let i = 0; i < terms.length; i++) {
+        const { term, weight } = terms[i];
+        progressText.textContent = `Lade Top Artists (${term})…`;
+        progressBar.style.width = `${(i / 3) * 100}%`;
+        const resp = await fetch(`https://api.spotify.com/v1/me/top/artists?limit=50&time_range=${term}`, {
+          headers: { Authorization: `Bearer ${spotifyAccessToken}` }
+        });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+        data.items.forEach((artist, idx) => {
+          const key = artist.name.toLowerCase();
+          // Score: position-weighted (50 = top, 1 = last), multiplied by recency weight
+          const posScore = (50 - idx) * weight;
+          scores[key] = (scores[key] || 0) + posScore;
+        });
+        await new Promise(r => setTimeout(r, 100));
+      }
+      progressBar.style.width = '100%';
+    }
+
+    progressText.textContent = 'Gleiche mit Bands ab…';
+
+    // Match scores against band names using fuzzy comparison
+    const matchedScores = {};
+    const resultItems = [];
+
+    for (const id of ALL_IDS) {
+      const s = slotById[id];
+      const key = s.band.toLowerCase();
+      const exactScore = scores[key];
+      if (exactScore) {
+        matchedScores[key] = exactScore;
+        resultItems.push({ name: s.band, score: exactScore, matched: true });
+        continue;
+      }
+      // Try partial match: Spotify artist might have slightly different name
+      let bestScore = 0;
+      for (const [spKey, spScore] of Object.entries(scores)) {
+        if (spKey.includes(key) || key.includes(spKey)) {
+          if (spScore > bestScore) bestScore = spScore;
+        }
+      }
+      if (bestScore > 0) {
+        matchedScores[key] = bestScore;
+        resultItems.push({ name: s.band, score: bestScore, matched: true });
+      }
+    }
+
+    // Deduplicate result display by band name
+    const seen = new Set();
+    const dedupedResults = resultItems.filter(r => {
+      if (seen.has(r.name)) return false;
+      seen.add(r.name);
+      return true;
+    });
+
+    dedupedResults.sort((a, b) => b.score - a.score);
+
+    // Show results
+    progressEl.classList.remove('visible');
+    resultsEl.classList.add('visible');
+
+    const matched = dedupedResults.filter(r => r.matched);
+    resultsEl.innerHTML = `<div style="font-size:.6rem;color:var(--muted);margin-bottom:8px;letter-spacing:.1em;">
+      ${matched.length} BANDS ERKANNT (${spMode === 'liked' ? 'Songs in Library' : 'Top-Artist-Score'})
+    </div>`;
+
+    dedupedResults.slice(0, 20).forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'result-item matched';
+      const label = spMode === 'liked' ? `♥ ${r.score}` : `${r.score}pts`;
+      div.innerHTML = `<span class="result-score spotify">${label}</span><span class="result-name">${r.name}</span>`;
+      resultsEl.appendChild(div);
+    });
+
+    if (dedupedResults.length > 20) {
+      const more = document.createElement('div');
+      more.style.cssText = 'font-size:.58rem;color:var(--muted);padding:4px 8px;';
+      more.textContent = `… und ${dedupedResults.length - 20} weitere`;
+      resultsEl.appendChild(more);
+    }
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'btn btn-spotify';
+    applyBtn.style.cssText = 'width:100%;margin-top:10px;';
+    applyBtn.textContent = `RANKING ANWENDEN (${matched.length} Bands)`;
+    applyBtn.onclick = () => {
+      applyAutoRanking(matchedScores, 'spotify', matched.map(r => r.name));
+      closeModal('spotify');
+    };
+    resultsEl.appendChild(applyBtn);
+
+  } catch(e) {
+    progressEl.classList.remove('visible');
+    showToast('Fehler: ' + e.message);
+  } finally {
+    document.getElementById('spotify-run-btn').disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// LAST.FM INTEGRATION
+// ═══════════════════════════════════════════════════
+
+let lfmPeriod = 'overall';
+let lfmMode = 'scrobbles';
+
+function saveLastfmApiKey() {
+  // input removed, key is hardcoded
+}
+
+function setLfmPeriod(period) {
+  lfmPeriod = period;
+  ['overall','12month','6month','3month'].forEach(p => {
+    document.getElementById(`lfm-period-${p}`).classList.toggle('active', p === period);
+  });
+}
+
+function setLfmMode(mode) {
+  lfmMode = mode;
+  document.getElementById('lfm-mode-scrobbles').classList.toggle('active', mode === 'scrobbles');
+  document.getElementById('lfm-mode-rank').classList.toggle('active', mode === 'rank');
+  document.getElementById('lfm-mode-hint').textContent = mode === 'scrobbles'
+    ? 'Je mehr Scrobbles, desto weiter oben im Ranking.'
+    : 'Dein Last.fm Chart-Rang bestimmt die Reihenfolge (Rang 1 = oben).';
+}
+
+async function runLastfmRanking() {
+  const apiKey = localStorage.getItem('rip3_lastfm_api_key') || '714af6732f52c8f5f859dae45020bd3d';
+  const username = document.getElementById('lastfm-username').value.trim();
+
+  if (!apiKey) { showToast('Kein API Key gefunden!'); return; }
+  if (!username) { showToast('Bitte Username eingeben!'); return; }
+
+  localStorage.setItem('rip3_lastfm_username', username);
+
+  const progressEl = document.getElementById('lastfm-progress');
+  const progressText = document.getElementById('lastfm-progress-text');
+  const progressBar = document.getElementById('lastfm-progress-bar');
+  const resultsEl = document.getElementById('lastfm-results');
+
+  progressEl.classList.add('visible');
+  resultsEl.classList.remove('visible');
+  resultsEl.innerHTML = '';
+  document.getElementById('lastfm-run-btn').disabled = true;
+
+  try {
+    // Fetch top artists – up to 1000 (paginated, 200 per page)
+    const allArtists = [];
+    let page = 1;
+    const limit = 200;
+    const maxPages = 5;
+
+    progressText.textContent = `Lade Top Artists von ${username}…`;
+
+    while (page <= maxPages) {
+      const url = `https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${encodeURIComponent(username)}&api_key=${apiKey}&format=json&period=${lfmPeriod}&limit=${limit}&page=${page}`;
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+
+      if (data.error) throw new Error(`Last.fm Fehler ${data.error}: ${data.message}`);
+
+      const artists = data.topartists?.artist;
+      if (!artists || !Array.isArray(artists) || artists.length === 0) break;
+
+      for (const a of artists) {
+        allArtists.push({
+          name: a.name,
+          playcount: parseInt(a.playcount) || 0,
+          rank: parseInt(a['@attr']?.rank) || allArtists.length + 1
+        });
+      }
+
+      const totalPages = parseInt(data.topartists?.['@attr']?.totalPages) || 1;
+      progressBar.style.width = `${(page / Math.min(totalPages, maxPages)) * 100}%`;
+      progressText.textContent = `Seite ${page}/${Math.min(totalPages, maxPages)} · ${allArtists.length} Artists geladen`;
+
+      if (page >= totalPages) break;
+      page++;
+      await new Promise(r => setTimeout(r, 100));
+    }
+
+    progressText.textContent = 'Gleiche mit Bands ab…';
+    progressBar.style.width = '100%';
+
+    // Build score map
+    const scores = {};
+    for (const a of allArtists) {
+      const key = a.name.toLowerCase();
+      const score = lfmMode === 'scrobbles' ? a.playcount : (10000 - a.rank); // inverted rank so higher = better
+      scores[key] = score;
+    }
+
+    // Match to band slots
+    const matchedScores = {};
+    const resultItems = [];
+
+    for (const id of ALL_IDS) {
+      const s = slotById[id];
+      const key = s.band.toLowerCase();
+      let score = scores[key];
+
+      if (!score) {
+        // Try partial match
+        for (const [lfmKey, lfmScore] of Object.entries(scores)) {
+          if (lfmKey.includes(key) || key.includes(lfmKey)) {
+            if (!score || lfmScore > score) score = lfmScore;
+          }
+        }
+      }
+
+      if (score) {
+        matchedScores[key] = score;
+        const origArtist = allArtists.find(a => {
+          const k = a.name.toLowerCase();
+          return k === key || k.includes(key) || key.includes(k);
+        });
+        resultItems.push({
+          name: s.band,
+          score,
+          playcount: origArtist?.playcount || 0,
+          matched: true
+        });
+      }
+    }
+
+    // Dedup by band name
+    const seen = new Set();
+    const dedupedResults = resultItems.filter(r => {
+      if (seen.has(r.name)) return false;
+      seen.add(r.name);
+      return true;
+    });
+    dedupedResults.sort((a, b) => b.score - a.score);
+
+    // Show results
+    progressEl.classList.remove('visible');
+    resultsEl.classList.add('visible');
+
+    const matched = dedupedResults.filter(r => r.matched);
+    resultsEl.innerHTML = `<div style="font-size:.6rem;color:var(--muted);margin-bottom:8px;letter-spacing:.1em;">
+      ${matched.length} BANDS ERKANNT · ${allArtists.length} Artists total von Last.fm
+    </div>`;
+
+    dedupedResults.slice(0, 20).forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'result-item matched';
+      const label = lfmMode === 'scrobbles'
+        ? `${r.playcount.toLocaleString('de-DE')}×`
+        : `#${allArtists.find(a => a.name.toLowerCase() === r.name.toLowerCase())?.rank || '?'}`;
+      div.innerHTML = `<span class
