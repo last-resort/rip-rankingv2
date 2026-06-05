@@ -202,6 +202,8 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;height:3p
     </select>
     <label>Nur Jahr filtern (leer = alle Jahre)</label>
     <select id="lfm-year"><option value="">Alle Jahre</option></select>
+    <label>Mindest-Scrobbles (Bands darunter werden ignoriert)</label>
+    <input type="text" id="lfm-min" placeholder="0" autocomplete="off" inputmode="numeric">
     <div class="modal-row">
       <button class="btn btn-accent" onclick="runLastfm()">LADEN & RANKEN</button>
       <button class="btn" onclick="closeLastfm()">ABBRECHEN</button>
@@ -721,6 +723,7 @@ async function runLastfm() {
   let   apiKey = document.getElementById('lfm-key').value.trim() || LASTFM_API_KEY;
   const period = document.getElementById('lfm-mode').value;
   const yearFilter = parseInt(document.getElementById('lfm-year').value) || null;
+  const minPlays = parseInt(document.getElementById('lfm-min').value) || 0;
   const status = document.getElementById('lfm-status');
 
   if (!user) { status.className='modal-status err'; status.textContent='Bitte Benutzernamen eingeben.'; return; }
@@ -765,23 +768,32 @@ async function runLastfm() {
   });
 
   // Match band names (exact or case-insensitive)
+  // Bands below minPlays OR not found on Last.fm are excluded → left column
   const withScore = [];
-  const noScore   = [];
+  const ignored   = [];  // matched but below threshold → stay unranked
+  const notFound  = [];  // not on Last.fm at all → stay unranked
   for (const id of slotsToRank) {
     const name = slotById[id].band.toLowerCase();
     const plays = playsMap[name] ?? null;
-    if (plays !== null) withScore.push({ id, plays });
-    else noScore.push(id);
+    if (plays !== null && plays >= minPlays) withScore.push({ id, plays });
+    else if (plays !== null && plays < minPlays) ignored.push(id);
+    else notFound.push(id);  // not found on Last.fm at all
   }
 
   // Sort by plays desc
   withScore.sort((a, b) => b.plays - a.plays);
 
-  const newRanked = [...withScore.map(x => x.id), ...noScore];
+  // Only matched bands above threshold go into the ranking.
+  // Unmatched + below-threshold bands are excluded → land in left column.
+  const newRanked = withScore.map(x => x.id);
   const matched = withScore.length;
   const total   = slotsToRank.length;
 
-  if (!confirm(`${matched} von ${total} Auftritten gematcht.\nAktuelles Ranking ersetzen?`)) return;
+  let msg = `${matched} von ${total} Auftritten gerankt.`;
+  if (notFound.length) msg += `\n${notFound.length} nicht bei Last.fm gehört → ignoriert.`;
+  if (minPlays > 0) msg += `\n${ignored.length} unter ${minPlays} Scrobbles → ignoriert.`;
+  msg += `\nAktuelles Ranking ersetzen?`;
+  if (!confirm(msg)) return;
 
   // Keep slots not in scope unchanged (other years)
   const scopeSet = new Set(slotsToRank);
@@ -899,23 +911,25 @@ async function spotifyHandleCallback() {
   const totalTracks = Object.values(artists).reduce((s,v) => s+v, 0);
 
   // Match against band slots
+  // Bands without any liked song are excluded → left column
   const withScore = [];
-  const noScore   = [];
+  const notFound  = [];
   for (const id of ALL_IDS) {
     const key = slotById[id].band.toLowerCase();
     const score = artists[key] ?? null;
     if (score !== null) withScore.push({ id, score });
-    else noScore.push(id);
+    else notFound.push(id);
   }
   withScore.sort((a, b) => b.score - a.score);
 
   const matched = withScore.length;
-  if (!confirm(`Spotify: ${totalTracks} Liked Songs geladen.\n${matched} von ${ALL_IDS.length} Auftritten gematcht.\nAktuelles Ranking ersetzen?`)) {
+  if (!confirm(`Spotify: ${totalTracks} Liked Songs geladen.\n${matched} von ${ALL_IDS.length} Auftritten gerankt.\n${notFound.length} ohne Liked Song → ignoriert.\nAktuelles Ranking ersetzen?`)) {
     if (btn) { btn.textContent = 'SPOTIFY'; btn.disabled = false; }
     return;
   }
 
-  ranked  = [...withScore.map(x => x.id), ...noScore];
+  // Only matched bands go into the ranking; unmatched land in left column
+  ranked  = withScore.map(x => x.id);
   unranked = ALL_IDS.filter(x => !rankedIdsSet().has(x));
   save();
   renderBandList(); renderRanked(); renderStats();
